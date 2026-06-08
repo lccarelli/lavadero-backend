@@ -1,0 +1,48 @@
+# Orquesta MySQL + backend + frontend.
+# IMPORTANTE: este compose espera que el repo del frontend esté clonado
+# como carpeta hermana de este repo:
+#
+#   tp-lavadero/
+#   ├── lavadero-backend/   <- este repo (acá vive el compose)
+#   └── lavadero-frontend/  <- repo del frontend (build context de abajo)
+#
+# Levantar todo:  docker-compose up --build
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-lavadero_db}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mysql
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ../lavadero-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
