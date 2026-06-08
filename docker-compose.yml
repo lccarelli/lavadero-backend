@@ -1,12 +1,15 @@
 # Orquesta MySQL + backend + frontend.
-# IMPORTANTE: este compose espera que el repo del frontend esté clonado
-# como carpeta hermana de este repo:
+#
+# Corre SIN necesidad de crear un .env: todos los valores tienen default acá
+# (${VAR:-default}). Un profe solo necesita: clonar ambos repos como carpetas
+# hermanas + `docker compose up --build`. Si existe un .env local, sus valores
+# sobreescriben los defaults (útil para desarrollo).
 #
 #   tp-lavadero/
 #   ├── lavadero-backend/   <- este repo (acá vive el compose)
 #   └── lavadero-frontend/  <- repo del frontend (build context de abajo)
 #
-# Levantar todo:  docker-compose up --build
+# Levantar todo:  docker compose up --build
 services:
   mysql:
     image: mysql:8
@@ -25,10 +28,17 @@ services:
 
   backend:
     build: .
-    env_file:
-      - .env
     environment:
+      PORT: 3000
+      NODE_ENV: ${NODE_ENV:-development}
       DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-lavadero_db}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      SESSION_SECRET: ${SESSION_SECRET:-cambiar-esto-en-produccion}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      UPLOAD_MAX_SIZE_MB: ${UPLOAD_MAX_SIZE_MB:-2}
     ports:
       - "3000:3000"
     volumes:
