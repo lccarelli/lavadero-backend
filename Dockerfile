@@ -4,7 +4,10 @@ WORKDIR /app
 
 # Instalar dependencias primero (mejor cache de capas)
 COPY package*.json ./
-RUN npm install --omit=dev
+# Por defecto solo deps de producción. En dev (docker-compose.dev.yml) se pasa
+# INSTALL_DEV=true para incluir vitest/supertest y poder correr tests/--watch.
+ARG INSTALL_DEV=false
+RUN if [ "$INSTALL_DEV" = "true" ]; then npm install; else npm install --omit=dev; fi
 
 # Código de la app
 COPY src/ ./src/
