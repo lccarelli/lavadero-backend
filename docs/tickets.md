@@ -120,6 +120,31 @@
 
 ---
 
+## TK-S-06: Hot reload en desarrollo (compose dev)
+
+**Objetivo:** Que en desarrollo el código se recargue solo, sin rebuildear la imagen ni reiniciar contenedores a mano. Levantar con un comando y editar `src/` (backend) o `public/` (frontend) reflejándose al toque. El compose base (producción) no se toca.
+
+**Tareas:**
+- [ ] Crear `docker-compose.dev.yml` como override de desarrollo (no se carga solo; se activa explícito)
+- [ ] Backend: montar `./src`, `./seeders` y `./uploads` como volúmenes del host (hot reload sin rebuild)
+- [ ] Backend: arrancar con `npm run dev` (`node --watch src/app.js`) en vez de `node src/app.js`
+- [ ] Backend: construir la imagen con dev deps vía `ARG INSTALL_DEV=true` (vitest/supertest disponibles dentro del contenedor)
+- [ ] Frontend: montar `../lavadero-frontend/public` en `/usr/share/nginx/html:ro` para refrescar estáticos sin rebuild
+- [ ] Script `docker:dev` en `package.json`: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d`
+- [ ] Documentar el flujo de dev en el README (cómo levantar con hot reload)
+
+**Criterio de aceptación:**
+- `npm run docker:dev` levanta los 3 servicios con el override aplicado
+- Editar un archivo de `src/` reinicia el proceso del backend solo (log de `node --watch`), sin `docker compose build`
+- Editar un archivo de `public/` del frontend se ve al refrescar el navegador, sin rebuild
+- `docker compose up --build` (sin el override) sigue arrancando en modo producción, idéntico a antes
+- Las dev deps (vitest/supertest) están disponibles dentro del contenedor de backend en modo dev
+
+**Estimación:** 1 h
+**Fullstack:** ❌ (es infra de DX)
+
+---
+
 # FASE 2: Tickets fullstack
 
 A partir de acá, cada ticket toca BD + backend + frontend + tests donde corresponda.

@@ -37,6 +37,7 @@ tickets=(
 "[TK-S-03] Backend arranca en Docker y se conecta a la DB|setup,fase-1,backend|testConnection() + /health + test Supertest. Detalle: docs/board-issues.md"
 "[TK-S-04] Frontend (nginx) sirve estáticos y hace fetch al backend|setup,fase-1,frontend|index.html + api.js + main.js + CORS + test. Detalle: docs/board-issues.md"
 "[TK-S-05] GitHub Actions (CI básico) - opcional|setup,fase-1,infra,prioridad-baja|Workflow que corre npm test en cada PR. Detalle: docs/board-issues.md"
+"[TK-S-06] Hot reload en desarrollo (compose dev)|setup,fase-1,infra|docker-compose.dev.yml override: volúmenes de código + node --watch + dev deps + nginx public:ro + npm run docker:dev. Detalle: docs/board-issues.md"
 "[TK-F-01] Modelo Categoria + endpoint de listado|fullstack,fase-2|Categoria en BD + GET /api/categorias + getCategorias() en front. CUs: 2.1.1, 2.2.1, 3.1.3. Detalle: docs/board-issues.md"
 "[TK-F-02] Modelo Producto + alta + listado paginado|fullstack,fase-2|Producto + paginación + alta con imagen + productos.html. CUs: 2.1.2, 2.2.2, 3.1.1, 3.2.1, 3.3.1, 5.2.x. Detalle: docs/board-issues.md"
 "[TK-F-03] Modelo Usuario + autenticación admin|fullstack,fase-2,backend|Usuario + login sesión + EJS login + requireAdmin. CUs: 2.1.3, 2.2.3, 4.x. Detalle: docs/board-issues.md"

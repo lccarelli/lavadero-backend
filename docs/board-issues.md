@@ -120,6 +120,31 @@ el `##` es el título, los `Labels:` son las etiquetas, y el cuerpo va tal cual.
 
 ---
 
+## [TK-S-06] Hot reload en desarrollo (compose dev)
+
+`Labels: setup, fase-1, infra`
+
+**Objetivo:** En desarrollo el código se recarga solo, sin rebuild ni reinicios a mano. El compose base (producción) no se toca.
+
+**Tareas:**
+- [ ] `docker-compose.dev.yml` como override de dev (se activa explícito, no se carga solo)
+- [ ] Backend: volúmenes `./src`, `./seeders`, `./uploads` + arranque con `npm run dev` (`node --watch`)
+- [ ] Backend: imagen con dev deps vía `ARG INSTALL_DEV=true`
+- [ ] Frontend: montar `../lavadero-frontend/public` en `/usr/share/nginx/html:ro`
+- [ ] Script `docker:dev` en `package.json` (`compose -f base -f dev up --build -d`)
+- [ ] Documentar el flujo de dev en el README
+
+**Criterio de aceptación:**
+- `npm run docker:dev` levanta los 3 servicios con el override
+- Editar `src/` reinicia el backend solo (sin `build`)
+- Editar `public/` del frontend se ve al refrescar (sin rebuild)
+- `docker compose up --build` (sin override) sigue arrancando en modo producción
+- vitest/supertest disponibles dentro del contenedor de backend en dev
+
+**Estimación:** 1 h · **Fullstack:** ❌
+
+---
+
 ## [TK-F-01] Modelo Categoria + endpoint de listado
 
 `Labels: fullstack, fase-2, epica-2, epica-3`
