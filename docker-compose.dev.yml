@@ -1,0 +1,29 @@
+# Override de DESARROLLO. No se carga solo: se activa explícitamente con
+#   npm run docker:dev
+# (que hace: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build)
+#
+# Diferencias respecto al compose base:
+#   - Monta el código del host como volumen (hot reload sin rebuild).
+#   - Arranca con `npm run dev` (node --watch) en vez de `node src/app.js`.
+#   - Construye la imagen con dev deps (vitest/supertest) vía INSTALL_DEV=true.
+#
+# El compose base (docker-compose.yml) sigue siendo el de producción y no se toca:
+# `docker compose up --build` arranca igual que siempre.
+services:
+  backend:
+    build:
+      context: .
+      args:
+        INSTALL_DEV: "true"
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./src:/app/src
+      - ./seeders:/app/seeders
+      - ./uploads:/app/uploads
+
+  frontend:
+    #actualiza live todo dentro del directorio public
+    volumes:
+      - ../lavadero-frontend/public:/usr/share/nginx/html:ro
