@@ -1,4 +1,10 @@
 import sequelize, { testConnection } from '../src/config/database.js';
+import { syncDatabase, Categoria } from '../src/models/index.js';
+
+const categorias = [
+  { nombre: 'Lavados', descripcion: 'Servicios de lavado de vehículos' },
+  { nombre: 'Accesorios', descripcion: 'Productos y accesorios para el vehículo' },
+];
 
 // TODO: este archivo va a ejecutarse con `npm run seed`
 // Debe:
@@ -12,9 +18,13 @@ import sequelize, { testConnection } from '../src/config/database.js';
 const seed = async () => {
   console.log('Iniciando seeders...');
   await testConnection();
-  
+  await syncDatabase();
+
   // TODO: implementar en el CU correspondiente
-  
+  for (const cat of categorias) {
+    await Categoria.findOrCreate({ where: { nombre: cat.nombre }, defaults: cat });
+  }
+
   console.log('Seeders completados');
   await sequelize.close();
 };

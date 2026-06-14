@@ -1,7 +1,7 @@
 import sequelize from '../config/database.js';
 
 // TODO: importar modelos cuando se vayan creando
-// import Categoria from './Categoria.js';
+import Categoria from './Categoria.js';
 // import Producto from './Producto.js';
 // import Usuario from './Usuario.js';
 // import Venta from './Venta.js';
@@ -23,4 +23,4 @@ export const syncDatabase = async () => {
   }
 };
 
-export { sequelize };
+export { sequelize, Categoria };

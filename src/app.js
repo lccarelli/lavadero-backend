@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import apiRoutes from './routes/api/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,7 +33,7 @@ app.get('/health', (req, res) => {
 });
 
 // TODO: rutas API y admin (se agregan en tickets posteriores)
-// app.use('/api', apiRoutes);
+app.use('/api', apiRoutes);
 // app.use('/admin', adminRoutes);
 
 // Middleware central de errores
