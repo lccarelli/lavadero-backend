@@ -1,10 +1,6 @@
 import sequelize, { testConnection } from '../src/config/database.js';
-import { syncDatabase, Categoria } from '../src/models/index.js';
-
-const categorias = [
-  { nombre: 'Lavados', descripcion: 'Servicios de lavado de vehículos' },
-  { nombre: 'Accesorios', descripcion: 'Productos y accesorios para el vehículo' },
-];
+import { syncDatabase } from '../src/models/index.js';
+import { warmup } from '../src/config/warmup.js';
 
 // TODO: este archivo va a ejecutarse con `npm run seed`
 // Debe:
@@ -20,10 +16,7 @@ const seed = async () => {
   await testConnection();
   await syncDatabase();
 
-  // TODO: implementar en el CU correspondiente
-  for (const cat of categorias) {
-    await Categoria.findOrCreate({ where: { nombre: cat.nombre }, defaults: cat });
-  }
+  await warmup(); // asegura las categorías base (idempotente)
 
   console.log('Seeders completados');
   await sequelize.close();
