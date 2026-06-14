@@ -17,13 +17,23 @@ const sequelize = new Sequelize(
   }
 );
 
-export const testConnection = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Conexión a MySQL establecida correctamente');
-  } catch (error) {
-    console.error('No se pudo conectar a la base de datos:', error.message);
-    process.exit(1);
+// Reintenta para tolerar que MySQL todavía no acepte conexiones cuando el
+// backend arranca (típico con base nueva en Docker: el healthcheck da "healthy"
+// antes de que el puerto TCP esté listo).
+export const testConnection = async (reintentos = 10, esperaMs = 3000) => {
+  for (let intento = 1; intento <= reintentos; intento++) {
+    try {
+      await sequelize.authenticate();
+      console.log('Conexión a MySQL establecida correctamente');
+      return;
+    } catch (error) {
+      console.log(`MySQL no disponible (intento ${intento}/${reintentos}): ${error.message}`);
+      if (intento === reintentos) {
+        console.error('No se pudo conectar a la base de datos tras varios intentos');
+        process.exit(1);
+      }
+      await new Promise((resolve) => setTimeout(resolve, esperaMs));
+    }
   }
 };
 
