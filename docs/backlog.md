@@ -2,9 +2,9 @@
 ## Lavadero de autos - Autoservicio
 
 **Convenciones:**
-- 🎯 = Obligatorio para cursada (promoción)
-- ⭐ = Requerimiento extra para fecha de final
-- 🔧 = Tarea técnica / infraestructura (no funcional pero obligatoria)
+- (obligatorio) = Obligatorio para cursada (promoción)
+- (final) = Requerimiento extra para fecha de final
+- (infra) = Tarea técnica / infraestructura (no funcional pero obligatoria)
 
 ---
 
@@ -12,7 +12,7 @@
 
 Objetivo: dejar ambos proyectos (frontend y backend) corriendo localmente con todas las dependencias configuradas y un esqueleto navegable.
 
-## Feature 1.1: Configuración del proyecto backend 🔧
+## Feature 1.1: Configuración del proyecto backend (infra)
 
 ### CU 1.1.1: Inicializar proyecto Node.js + Express
 - Crear `package.json` con scripts `start` y `dev` (nodemon)
@@ -39,7 +39,7 @@ Objetivo: dejar ambos proyectos (frontend y backend) corriendo localmente con to
 - express-session o JWT para autenticación (ver épica 4)
 - Middleware de manejo de errores centralizado
 
-## Feature 1.2: Configuración del proyecto frontend 🔧
+## Feature 1.2: Configuración del proyecto frontend (infra)
 
 ### CU 1.2.1: Estructura del proyecto frontend (HTML/CSS/JS vanilla)
 - Crear carpeta `frontend/public/` con un `.html` por pantalla (`index.html`, `productos.html`, `carrito.html`, `ticket.html`, etc.)
@@ -55,20 +55,20 @@ Objetivo: dejar ambos proyectos (frontend y backend) corriendo localmente con to
 - Configurar favicon
 - Header con logo + nombre + nombres de integrantes incluido en TODAS las pantallas (vía función JS compartida en `nav.js` o por copy/paste consistente del bloque `<header>`)
 
-### CU 1.2.3: Sistema de temas claro/oscuro 🎯
+### CU 1.2.3: Sistema de temas claro/oscuro (obligatorio)
 - Variables CSS para colores en `:root` (tema claro) y `[data-theme="dark"]` (tema oscuro)
 - Toggle de tema en header que cambia el `data-theme` del `<html>`
 - Persistir elección en localStorage
 - Aplicar tema antes del primer render leyendo localStorage en un script en el `<head>`
 - **Criterio:** al recargar, el tema elegido se mantiene
 
-### CU 1.2.4: Barra de navegación persistente 🎯
+### CU 1.2.4: Barra de navegación persistente (obligatorio)
 - Siempre visible en todas las pantallas (incluida en el `<header>` compartido)
 - Links `<a href="...html">` contextuales (según pantalla actual)
 - Botón de acceso al login admin
 - **Criterio:** el cliente nunca debe necesitar escribir una ruta a mano
 
-## Feature 1.3: Dockerización 🔧
+## Feature 1.3: Dockerización (infra)
 
 ### CU 1.3.1: Dockerfile del backend
 - Imagen base `node:18-alpine`
@@ -100,7 +100,7 @@ Objetivo: dejar ambos proyectos (frontend y backend) corriendo localmente con to
 
 Objetivo: schema de BD estable que soporte todas las operaciones del sistema.
 
-## Feature 2.1: Diseño del schema 🎯
+## Feature 2.1: Diseño del schema (obligatorio)
 
 ### CU 2.1.1: Modelo Categoria
 - Campos: id (PK), nombre, descripcion
@@ -122,24 +122,24 @@ Objetivo: schema de BD estable que soporte todas las operaciones del sistema.
 - Campos: id, venta_id, producto_id, cantidad, precio_unitario (snapshot)
 - **Importante:** guardar el precio al momento de la venta, no leerlo en runtime
 
-### CU 2.1.6: Modelo Encuesta ⭐
+### CU 2.1.6: Modelo Encuesta (final)
 - Campos: id, email, comentario, puntuacion (1-10), recomendaria (bool), imagen, fecha, venta_id (FK opcional)
 
-### CU 2.1.7: Modelo LogLogin ⭐
+### CU 2.1.7: Modelo LogLogin (final)
 - Campos: id, usuario_id, fecha, exitoso (bool), ip
 
 ## Feature 2.2: Datos de prueba (seeds)
 
-### CU 2.2.1: Seed de categorías 🎯
+### CU 2.2.1: Seed de categorías (obligatorio)
 - Insertar "Lavados" y "Accesorios"
 
-### CU 2.2.2: Seed de productos variados 🎯
+### CU 2.2.2: Seed de productos variados (obligatorio)
 - Mínimo 10 productos activos (5 por categoría) para poder probar paginación
 - Productos de ejemplo:
   - Lavados: Express, Completo, Premium, Detailing, Lavado de motor, Pulido de faros, Tratamiento tapizado
   - Accesorios: Shampoo, Cera, Microfibra, Aromatizante, Limpiavidrios, Abrillantador, Renovador de plástico
 
-### CU 2.2.3: Seed de usuario admin 🎯
+### CU 2.2.3: Seed de usuario admin (obligatorio)
 - Crear admin de prueba (admin@lavadero.com / admin123)
 - Datos del botón de acceso rápido en el login
 
@@ -149,7 +149,7 @@ Objetivo: schema de BD estable que soporte todas las operaciones del sistema.
 
 Objetivo: API funcional que sirva todas las operaciones CRUD sobre productos con validación y paginación.
 
-## Feature 3.1: Consulta de productos 🎯
+## Feature 3.1: Consulta de productos (obligatorio)
 
 ### CU 3.1.1: Listar productos paginados
 - Endpoint: `GET /api/productos?page=1&limit=8&categoria=&activo=`
@@ -165,7 +165,7 @@ Objetivo: API funcional que sirva todas las operaciones CRUD sobre productos con
 - Endpoint: `GET /api/categorias`
 - Usado por el frontend para mostrar las tabs/filtros
 
-## Feature 3.2: Gestión CRUD de productos 🎯
+## Feature 3.2: Gestión CRUD de productos (obligatorio)
 
 ### CU 3.2.1: Alta de producto con imagen
 - Endpoint: `POST /api/productos` (multipart/form-data)
@@ -190,7 +190,7 @@ Objetivo: API funcional que sirva todas las operaciones CRUD sobre productos con
 - Endpoint: `PATCH /api/productos/:id/activar`
 - Cambia `activo = true`
 
-## Feature 3.3: Validaciones vía middleware 🎯
+## Feature 3.3: Validaciones vía middleware (obligatorio)
 
 ### CU 3.3.1: Middleware de validación de productos
 - Usar express-validator
@@ -208,7 +208,7 @@ Objetivo: API funcional que sirva todas las operaciones CRUD sobre productos con
 
 Objetivo: que solo usuarios autenticados puedan acceder al backoffice y modificar productos.
 
-## Feature 4.1: Registro de admin (vía API) 🎯
+## Feature 4.1: Registro de admin (vía API) (obligatorio)
 
 ### CU 4.1.1: Endpoint de registro
 - Endpoint: `POST /api/auth/registro-admin`
@@ -217,7 +217,7 @@ Objetivo: que solo usuarios autenticados puedan acceder al backoffice y modifica
 - Validar email único
 - `es_admin = true` por defecto en este endpoint
 
-## Feature 4.2: Login 🎯
+## Feature 4.2: Login (obligatorio)
 
 ### CU 4.2.1: Login vía API (JSON)
 - Endpoint: `POST /api/auth/login`
@@ -232,7 +232,7 @@ Objetivo: que solo usuarios autenticados puedan acceder al backoffice y modifica
 - En éxito: redirige a `/admin/dashboard`
 - En error: muestra mensaje en la misma vista
 
-### CU 4.2.3: Botón de acceso rápido 🎯
+### CU 4.2.3: Botón de acceso rápido (obligatorio)
 - Botón visible en pantalla de login
 - Al hacer click, autocompleta email y password del admin de prueba
 - **Justificación:** acelera el testing por parte de los profesores
@@ -252,7 +252,7 @@ Objetivo: que solo usuarios autenticados puedan acceder al backoffice y modifica
 
 Objetivo: el cliente puede completar todo el flujo desde bienvenida hasta ticket sin necesidad de escribir rutas.
 
-## Feature 5.1: Pantalla de bienvenida 🎯
+## Feature 5.1: Pantalla de bienvenida (obligatorio)
 
 ### CU 5.1.1: Input de nombre
 - Input obligatorio, mínimo 2 caracteres
@@ -261,7 +261,7 @@ Objetivo: el cliente puede completar todo el flujo desde bienvenida hasta ticket
 - En cada pantalla del flujo, si no hay nombre en sessionStorage, redirigir a `index.html`
 - **Criterio:** no se puede ver productos sin ingresar nombre
 
-## Feature 5.2: Pantalla de productos 🎯
+## Feature 5.2: Pantalla de productos (obligatorio)
 
 ### CU 5.2.1: Visualización por categorías
 - Tabs o filtros para alternar entre "Lavados" y "Accesorios"
@@ -291,7 +291,7 @@ Objetivo: el cliente puede completar todo el flujo desde bienvenida hasta ticket
 - Badge con cantidad total de items
 - Visible siempre en header
 
-## Feature 5.3: Pantalla de carrito 🎯
+## Feature 5.3: Pantalla de carrito (obligatorio)
 
 ### CU 5.3.1: Listado de productos en carrito
 - Mostrar cada producto con: imagen, nombre, precio unitario, cantidad, subtotal
@@ -317,7 +317,7 @@ Objetivo: el cliente puede completar todo el flujo desde bienvenida hasta ticket
 - **Importante:** el total se calcula en backend, NO en frontend
 - En éxito: redirigir a ticket con datos de la venta
 
-## Feature 5.4: Pantalla de ticket 🎯
+## Feature 5.4: Pantalla de ticket (obligatorio)
 
 ### CU 5.4.1: Mostrar ticket
 - Datos: nombre de empresa, nombre del cliente, fecha actual, productos con cantidades y subtotales, total
@@ -338,7 +338,7 @@ Objetivo: el cliente puede completar todo el flujo desde bienvenida hasta ticket
 
 Objetivo: que el admin pueda gestionar productos completamente desde el panel renderizado por el servidor.
 
-## Feature 6.1: Dashboard 🎯
+## Feature 6.1: Dashboard (obligatorio)
 
 ### CU 6.1.1: Listado de productos
 - Tabla con: imagen, nombre, categoría, precio, estado (activo/inactivo)
@@ -353,14 +353,14 @@ Objetivo: que el admin pueda gestionar productos completamente desde el panel re
 ### CU 6.1.3: Botón "Agregar producto"
 - Navega a pantalla de alta
 
-### CU 6.1.4: Botón "Descargar ventas en Excel" 🎯
+### CU 6.1.4: Botón "Descargar ventas en Excel" (obligatorio)
 - Descarga archivo .xlsx con todas las ventas
 - Incluir: id venta, nombre cliente, fecha, total, productos asociados
 
-### CU 6.1.5: Botón "Ver registros" ⭐
+### CU 6.1.5: Botón "Ver registros" (final)
 - Navega a pantalla de registros (solo final)
 
-## Feature 6.2: Alta y modificación de productos 🎯
+## Feature 6.2: Alta y modificación de productos (obligatorio)
 
 ### CU 6.2.1: Pantalla de alta
 - Formulario con campos: nombre, descripción, precio, categoría (select), imagen (file input)
@@ -383,7 +383,7 @@ Objetivo: que el admin pueda gestionar productos completamente desde el panel re
 
 Objetivo: que el admin pueda extraer datos del sistema.
 
-## Feature 7.1: Exportación de ventas a Excel 🎯
+## Feature 7.1: Exportación de ventas a Excel (obligatorio)
 
 ### CU 7.1.1: Generar archivo .xlsx
 - Usar librería `exceljs`
@@ -396,7 +396,7 @@ Objetivo: que el admin pueda extraer datos del sistema.
 - Incluir productos asociados (eager loading con Sequelize)
 - Soportar paginación
 
-## Feature 7.2: Exportación de encuestas a Excel ⭐
+## Feature 7.2: Exportación de encuestas a Excel (final)
 
 ### CU 7.2.1: Generar archivo .xlsx de encuestas
 - Endpoint: `GET /admin/encuestas/excel`
@@ -404,11 +404,11 @@ Objetivo: que el admin pueda extraer datos del sistema.
 
 ---
 
-# ÉPICA 8: Encuestas (final) ⭐
+# ÉPICA 8: Encuestas (final) (final)
 
 Objetivo: capturar feedback del cliente después de cada compra.
 
-## Feature 8.1: Pantalla de encuesta ⭐
+## Feature 8.1: Pantalla de encuesta (final)
 
 ### CU 8.1.1: Redirigir desde ticket
 - Botón "salir" del ticket → pantalla de encuesta (no a bienvenida)
@@ -441,7 +441,7 @@ Objetivo: capturar feedback del cliente después de cada compra.
 - Botón "Volver al inicio"
 - Persistir encuesta en BD con fecha actual
 
-## Feature 8.2: Pantalla de detalle de producto ⭐
+## Feature 8.2: Pantalla de detalle de producto (final)
 
 ### CU 8.2.1: Ruta dinámica de detalle
 - Ruta: `/productos/:id`
@@ -454,11 +454,11 @@ Objetivo: capturar feedback del cliente después de cada compra.
 
 ---
 
-# ÉPICA 9: Registros y auditoría (final) ⭐
+# ÉPICA 9: Registros y auditoría (final) (final)
 
 Objetivo: dar visibilidad al admin sobre el uso del sistema.
 
-## Feature 9.1: Logs de login ⭐
+## Feature 9.1: Logs de login (final)
 
 ### CU 9.1.1: Registrar cada intento de login
 - En cada POST de login (exitoso o fallido), crear registro en `logs_login`
@@ -469,7 +469,7 @@ Objetivo: dar visibilidad al admin sobre el uso del sistema.
 - Tabla con últimos 50 logins
 - Columnas: fecha, usuario (o "email no registrado"), éxito, IP
 
-## Feature 9.2: Estadísticas ⭐
+## Feature 9.2: Estadísticas (final)
 
 ### CU 9.2.1: Top 10 productos más vendidos
 - Query con JOIN entre ventas_productos y productos
@@ -494,7 +494,7 @@ Objetivo: dar visibilidad al admin sobre el uso del sistema.
 
 # ÉPICA 10: Calidad, entrega y documentación
 
-## Feature 10.1: Estilos y diseño 🎯
+## Feature 10.1: Estilos y diseño (obligatorio)
 
 ### CU 10.1.1: Diseño responsive en todas las pantallas
 - Probar en mobile (375px), tablet (768px), desktop (1280px)
@@ -505,7 +505,7 @@ Objetivo: dar visibilidad al admin sobre el uso del sistema.
 - Tipografía coherente
 - Espaciado y jerarquía visual claros
 
-## Feature 10.2: Documentación 🔧
+## Feature 10.2: Documentación (infra)
 
 ### CU 10.2.1: README de cada repo
 - Instrucciones de instalación
@@ -517,7 +517,7 @@ Objetivo: dar visibilidad al admin sobre el uso del sistema.
 - Todos los endpoints documentados
 - Variables de entorno para token
 
-## Feature 10.3: Git workflow 🔧
+## Feature 10.3: Git workflow (infra)
 
 ### CU 10.3.1: Repositorios separados
 - Un repo frontend, un repo backend (en cuentas individuales o grupales)
