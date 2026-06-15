@@ -4,6 +4,9 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import apiRoutes from './routes/api/index.js';
+import { testConnection } from './config/database.js';
+import { syncDatabase } from './models/index.js';
+import { warmup } from './config/warmup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,8 +47,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend corriendo en http://localhost:${PORT}`);
-});
+// Arranque: valida la conexión a MySQL, sincroniza las tablas y asegura los
+// datos base (categorías). Recién después escucha. Así la API funciona en un
+// arranque limpio, sin depender de un seed manual.
+const start = async () => {
+  await testConnection();
+  await syncDatabase();
+  await warmup();
+  app.listen(PORT, () => {
+    console.log(`Backend corriendo en http://localhost:${PORT}`);
+  });
+};
+
+// No arranca al importar app.js en los tests (Vitest setea NODE_ENV='test').
+if (process.env.NODE_ENV !== 'test') {
+  start();
+}
 
 export default app;
