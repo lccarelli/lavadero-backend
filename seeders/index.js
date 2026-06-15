@@ -1,24 +1,42 @@
 import sequelize, { testConnection } from '../src/config/database.js';
-import { syncDatabase } from '../src/models/index.js';
+import { syncDatabase, Categoria, Producto } from '../src/models/index.js';
 import { warmup } from '../src/config/warmup.js';
 
-// TODO: este archivo va a ejecutarse con `npm run seed`
-// Debe:
-// 1. Conectar a la BD
-// 2. Sincronizar modelos
-// 3. Insertar categorías
-// 4. Insertar productos
-// 5. Insertar admin de prueba
-// 6. Cerrar conexión
+const productos = [
+  { nombre: 'Lavado Express', descripcion: 'Rápido y prolijo: agua a presión y espuma para un brillo al toque.', precio: 8.5, categoria: 'Lavados' },
+  { nombre: 'Lavado Completo', descripcion: 'Limpieza por dentro y por fuera para dejarlo como nuevo.', precio: 15.0, categoria: 'Lavados' },
+  { nombre: 'Lavado Premium', descripcion: 'Cera, brillo y aroma: el tratamiento más completo.', precio: 22.0, categoria: 'Lavados' },
+  { nombre: 'Shampoo', descripcion: 'Espuma suave para una limpieza profunda sin rayar.', precio: 6.0, categoria: 'Accesorios' },
+  { nombre: 'Cera', descripcion: 'Protección y brillo que dura semanas.', precio: 9.5, categoria: 'Accesorios' },
+  { nombre: 'Microfibra', descripcion: 'Paño premium que no deja marcas ni pelusa.', precio: 4.25, categoria: 'Accesorios' },
+];
 
 const seed = async () => {
   console.log('Iniciando seeders...');
   await testConnection();
   await syncDatabase();
 
-  await warmup(); // asegura las categorías base (idempotente)
+  // Categorías base: warmup() (compartido con el arranque del server). Idempotente.
+  await warmup();
 
-  console.log('Seeders completados');
+  // Productos, vinculados a su categoría por nombre. Idempotente.
+  const categorias = await Categoria.findAll();
+  const idCategoriaPorNombre = Object.fromEntries(
+    categorias.map((categoria) => [categoria.nombre, categoria.id])
+  );
+  for (const producto of productos) {
+    await Producto.findOrCreate({
+      where: { nombre: producto.nombre },
+      defaults: {
+        nombre: producto.nombre,
+        descripcion: producto.descripcion,
+        precio: producto.precio,
+        categoria_id: idCategoriaPorNombre[producto.categoria],
+      },
+    });
+  }
+
+  console.log(`Seeders completados (${productos.length} productos)`);
   await sequelize.close();
 };
 
