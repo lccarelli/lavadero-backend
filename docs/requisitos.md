@@ -404,8 +404,8 @@ autoservicio-lavadero-autos/
     │   ├── productos.html
     │   ├── carrito.html
     │   ├── ticket.html
-    │   ├── encuesta.html       (final ⭐)
-    │   ├── producto-detalle.html (final ⭐)
+    │   ├── encuesta.html       (final (final))
+    │   ├── producto-detalle.html (final (final))
     │   ├── css/
     │   │   ├── base.css        ← variables, reset
     │   │   ├── components.css  ← botones, cards, modal
@@ -419,7 +419,7 @@ autoservicio-lavadero-autos/
     │   │   ├── productos.js
     │   │   ├── carrito-page.js
     │   │   ├── ticket.js
-    │   │   └── encuesta.js     (final ⭐)
+    │   │   └── encuesta.js     (final (final))
     │   └── assets/
     │       ├── logo.svg
     │       └── favicon.ico

@@ -43,11 +43,11 @@ la pantalla de productos, todos juntos, porque tiene sentido hacerlos en una sol
 
 En `backlog.md` cada CU está marcado:
 
-- 🎯 **Obligatorio para cursada** (promoción)
-- ⭐ **Extra para fecha de final**
-- 🔧 **Técnico / infraestructura** (no funcional pero necesario)
+- (obligatorio) **Obligatorio para cursada** (promoción)
+- (final) **Extra para fecha de final**
+- (infra) **Técnico / infraestructura** (no funcional pero necesario)
 
-Esto permite priorizar: primero todo lo 🎯, los ⭐ solo si vamos a final.
+Esto permite priorizar: primero todo lo (obligatorio), los (final) solo si vamos a final.
 
 ### 1.4 Dos repos
 
@@ -73,7 +73,7 @@ Todos viven en `lavadero-backend/docs/`. El flujo de información es:
 ```
 consigna del TP
    └─> requisitos.md        separa RF / RNF y fija el stack
-        └─> backlog.md      desglosa en Épicas > Features > CUs (con 🎯/⭐/🔧)
+        └─> backlog.md      desglosa en Épicas > Features > CUs (con obligatorio/final/infra)
              └─> tickets.md agrupa CUs en Tickets de trabajo (TK-S / TK-F)
                   └─> board-issues.md   cada TK como issue listo para crear
                        └─> [board de GitHub]
@@ -92,8 +92,17 @@ consigna del TP
 | `runbook-tickets-y-board.md` | Este documento: el proceso | Meta |
 
 **Regla de oro:** la fuente de verdad de los CUs es `backlog.md`. La fuente de verdad de
-los tickets es `tickets.md`. `board-issues.md` es una *vista* de `tickets.md` formateada
-para GitHub. Si cambia un ticket, se actualiza `tickets.md` **y** `board-issues.md`.
+los **issues** (lo que va al board) es **`board-issues.md`**: tiene el checklist por CU de
+cada ticket y `armar-board.sh` lo parsea para crear/editar los issues. `tickets.md` es la
+narrativa de planificación (objetivo, capas, criterio en prosa). Si cambia un ticket, lo
+que **debe** actualizarse es `board-issues.md` (de ahí sale el board); actualizar la prosa
+de `tickets.md` es opcional.
+
+Cada CU del backlog está asignado a **exactamente un** ticket. Validalo cuando quieras:
+
+```bash
+bash docs/validar-cobertura.sh   # OK = todos los CUs cubiertos, sin huérfanos
+```
 
 ---
 
@@ -143,24 +152,34 @@ Cada ticket en `tickets.md` tiene **siempre** estas secciones:
   cubierto por algún ticket.
 - **Tareas como checklist** (`- [ ]`) para tachar progreso dentro del issue.
 
-### 3.4 El paso a `board-issues.md`
+### 3.4 El formato en `board-issues.md`
 
-`board-issues.md` toma cada ticket de `tickets.md` y lo deja en formato "issue":
+Cada ticket se escribe en `board-issues.md` con este formato (es lo que parsea el script):
 
 ```markdown
 ## [TK-F-NN] <título>
 
-`Labels: fullstack, fase-2, ...`
+Labels: fullstack, fase-2, ...
 
 **Objetivo:** ...
-**Tareas:** - [ ] ...
-**Criterio de aceptación:** - ...
-**Estimación / CUs:** ...
+
+**Casos de uso cubiertos:**
+- [ ] CU-X.Y.Z — descripción corta
+- [ ] CU-X.Y.W — ...
+
+**Tareas técnicas:**
+- [ ] ...
+
+**Criterio de aceptación:** ...
+
+**Estimación:** X hs
 ```
 
-El `##` es el **título del issue**. La línea `Labels:` define las etiquetas. El resto es
-el cuerpo. Es lo que el script lee conceptualmente (los textos están replicados en el
-script, ver §4).
+Reglas que el parser espera:
+- El `## [TK-..]` es el **título del issue** (el match al sincronizar es por el código `[TK-..]`).
+- La línea `Labels:` (sin backticks, primera después del título) define las etiquetas.
+- Todo lo que sigue hasta el próximo `## [TK-..]` es el **cuerpo**.
+- El checklist por CU es lo que da la trazabilidad fina y se tilda en GitHub.
 
 ---
 
@@ -173,8 +192,10 @@ Hay **un script todo-en-uno**: `docs/armar-board.sh`. Hace tres cosas, en orden,
 
 1. **Verifica permisos** del Project. Si faltan, avisa y corta.
 2. **Crea los labels** (idempotente: ignora los que ya existen).
-3. **Crea los issues**: por cada ticket, si ya existe uno con ese **título**, lo saltea;
-   si no, lo crea. Así correrlo de nuevo no genera duplicados.
+3. **Parsea `board-issues.md`** y, por cada ticket, hace *create-or-edit*: si ya existe un
+   issue con ese código `[TK-..]` lo **edita** (título + cuerpo + labels), si no lo **crea**.
+   El match es por el código `[TK-..]`, no por el título, así podés reformular títulos sin
+   generar duplicados. Correrlo de nuevo deja los issues idénticos a `board-issues.md`.
 4. **Agrega todos los issues del repo al Project** (`gh project item-add`, idempotente).
 
 ### 4.2 Requisitos previos
@@ -216,7 +237,7 @@ bash docs/armar-board.sh
 + creando:   [TK-F-07] Reportes - Excel de ventas
 ...
 --- agregando issues al Project #1 ---
-  ↳ https://github.com/lccarelli/lavadero-backend/issues/1
+  https://github.com/lccarelli/lavadero-backend/issues/1
 ...
 Listo. Board armado en Project #1 (lccarelli).
 ```
@@ -281,22 +302,23 @@ fix(CU-5.3.5): el cálculo del total ignoraba descuentos
 
 ## 6. Agregar o modificar un ticket
 
-El proceso es editar markdown y re-correr el script (que es idempotente):
+El proceso es editar `board-issues.md` y re-correr el script (idempotente):
 
-1. **¿Hay un CU nuevo?** Agregarlo primero en `backlog.md` (con su 🎯/⭐/🔧).
-2. **Definir/ajustar el ticket** en `tickets.md` con todas sus secciones (§3.2).
-3. **Reflejarlo en `board-issues.md`** (la vista formateada).
-4. **Agregar la entrada al array `tickets=(...)` de `armar-board.sh`** con el formato
-   `"titulo|labels|cuerpo"`.
-5. Re-correr:
+1. **¿Hay un CU nuevo?** Agregarlo primero en `backlog.md` (con su obligatorio/final/infra).
+2. **Agregar/editar el bloque del ticket en `board-issues.md`**, respetando el formato:
+   `## [TK-..] título`, luego `Labels: ...`, luego el cuerpo con el **checklist por CU**
+   (`- [ ] CU-X.Y.Z — descripción`). Si es un ticket nuevo, agregar también su fila a la
+   matriz de cobertura del final.
+3. (Opcional) Actualizar la prosa en `tickets.md`.
+4. Validar y sincronizar:
    ```bash
-   bash docs/armar-board.sh
+   bash docs/validar-cobertura.sh   # 0 huérfanos
+   bash docs/armar-board.sh         # crea el nuevo / edita los existentes
    ```
-   Los tickets viejos se saltean por título; solo se crea el nuevo y se agrega al board.
 
-> Si cambia el **título** de un ticket ya creado, el script lo trataría como nuevo
-> (crearía un duplicado). En ese caso, editar el título del issue en GitHub a mano, o
-> cerrar el viejo.
+> Reformular el **título** de un ticket ya creado es seguro: el match es por el código
+> `[TK-..]`, así que el script edita el issue existente (y le actualiza el título) en vez
+> de duplicarlo.
 
 ---
 

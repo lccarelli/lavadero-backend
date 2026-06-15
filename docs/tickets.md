@@ -25,7 +25,7 @@
 - El GitHub Project muestra columnas Backlog/En progreso/En revisión/Done
 
 **Estimación:** 30 min
-**Fullstack:** ❌ (es setup puro)
+**Fullstack:** (es setup puro)
 
 ---
 
@@ -53,7 +53,7 @@
 - `docker-compose down && docker-compose up` reinicia sin perder datos de la BD
 
 **Estimación:** 1.5 hs
-**Fullstack:** ❌ (es setup de infra)
+**Fullstack:** (es setup de infra)
 
 ---
 
@@ -75,7 +75,7 @@
 - Si se apaga MySQL, el backend muestra un error claro al intentar conectar
 
 **Estimación:** 45 min
-**Fullstack:** ❌ (es setup)
+**Fullstack:** (es setup)
 
 ---
 
@@ -98,7 +98,7 @@
 - `cd frontend && npm install && npm test` corre los tests del módulo `api.js` y pasan
 
 **Estimación:** 1 hs
-**Fullstack:** ❌ (es setup)
+**Fullstack:** (es setup)
 
 ---
 
@@ -115,33 +115,32 @@
 - PRs muestran el check de "tests passing" antes de poder mergear
 
 **Estimación:** 30 min
-**Fullstack:** ❌ (es infra)
+**Fullstack:** (es infra)
 **Prioridad:** baja (es nice-to-have, podemos saltearlo si vamos justos de tiempo)
 
 ---
 
 ## TK-S-06: Hot reload en desarrollo (compose dev)
 
-**Objetivo:** Que en desarrollo el código se recargue solo, sin rebuildear la imagen ni reiniciar contenedores a mano. Levantar con un comando y editar `src/` (backend) o `public/` (frontend) reflejándose al toque. El compose base (producción) no se toca.
+**Objetivo:** Que en desarrollo el código se recargue solo, sin rebuildear la imagen ni reiniciar contenedores a mano. El compose base (producción) no se toca.
 
 **Tareas:**
 - [ ] Crear `docker-compose.dev.yml` como override de desarrollo (no se carga solo; se activa explícito)
 - [ ] Backend: montar `./src`, `./seeders` y `./uploads` como volúmenes del host (hot reload sin rebuild)
 - [ ] Backend: arrancar con `npm run dev` (`node --watch src/app.js`) en vez de `node src/app.js`
-- [ ] Backend: construir la imagen con dev deps vía `ARG INSTALL_DEV=true` (vitest/supertest disponibles dentro del contenedor)
-- [ ] Frontend: montar `../lavadero-frontend/public` en `/usr/share/nginx/html:ro` para refrescar estáticos sin rebuild
-- [ ] Script `docker:dev` en `package.json`: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d`
-- [ ] Documentar el flujo de dev en el README (cómo levantar con hot reload)
+- [ ] Backend: construir la imagen con dev deps vía `ARG INSTALL_DEV=true`
+- [ ] Frontend: montar `../lavadero-frontend/public` en `/usr/share/nginx/html:ro`
+- [ ] Script `docker:dev` en `package.json`
+- [ ] Documentar el flujo de dev en el README
 
 **Criterio de aceptación:**
 - `npm run docker:dev` levanta los 3 servicios con el override aplicado
-- Editar un archivo de `src/` reinicia el proceso del backend solo (log de `node --watch`), sin `docker compose build`
-- Editar un archivo de `public/` del frontend se ve al refrescar el navegador, sin rebuild
-- `docker compose up --build` (sin el override) sigue arrancando en modo producción, idéntico a antes
-- Las dev deps (vitest/supertest) están disponibles dentro del contenedor de backend en modo dev
+- Editar un archivo de `src/` reinicia el backend solo, sin `docker compose build`
+- Editar un archivo de `public/` del frontend se ve al refrescar, sin rebuild
+- `docker compose up --build` (sin override) sigue arrancando en modo producción
 
 **Estimación:** 1 h
-**Fullstack:** ❌ (es infra de DX)
+**Fullstack:** no (es infra de DX)
 
 ---
 
@@ -357,7 +356,7 @@ A partir de acá, cada ticket toca BD + backend + frontend + tests donde corresp
 
 ---
 
-## TK-F-09 a TK-F-12: Tickets de final ⭐
+## TK-F-09 a TK-F-12: Tickets de final (final)
 
 Solo si necesitamos entregar para final (no para cursada):
 
