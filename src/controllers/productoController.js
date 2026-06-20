@@ -32,3 +32,23 @@ export const listar = async (req, res, next) => {
     next(err);
   }
 };
+
+// GET /api/productos/:id
+// 400 si el id no es válido, 404 si no existe, 200 con el producto (incluye categoría).
+export const obtenerProducto = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({ error: 'Id de producto inválido' });
+    }
+    const producto = await Producto.findByPk(id, {
+      include: [{ model: Categoria, as: 'categoria', attributes: ['id', 'nombre'] }],
+    });
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    res.json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
