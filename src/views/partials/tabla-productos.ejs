@@ -1,0 +1,49 @@
+<section class="tabla-seccion <%= modificador %>">
+  <h2 class="tabla-seccion__titulo"><%= titulo %></h2>
+
+  <% if (productos.length === 0) { %>
+    <p class="admin-main__text">No hay productos en esta categoría.</p>
+  <% } else { %>
+    <table class="tabla">
+      <colgroup>
+        <col class="col-nombre" />
+        <% if (campoExtra) { %><col class="col-extra" /><% } %>
+        <col class="col-precio" />
+        <col class="col-estado" />
+        <col class="col-acciones" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <% if (campoExtra) { %><th><%= etiquetaExtra %></th><% } %>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% productos.forEach((p) => { %>
+          <tr>
+            <td><%= p.nombre %></td>
+            <% if (campoExtra) { %>
+              <td>
+                <% if (p[campoExtra] == null) { %>—<% } else if (campoExtra === 'duracion') { %><%= p.duracion %> min<% } else { %><%= p[campoExtra] %><% } %>
+              </td>
+            <% } %>
+            <td class="tabla__precio">$<%= Number(p.precio).toFixed(2) %></td>
+            <td>
+              <span class="badge <%= p.activo ? 'badge--activo' : 'badge--inactivo' %>">
+                <%= p.activo ? 'Activo' : 'Inactivo' %>
+              </span>
+            </td>
+            <td>
+              <a class="accion" href="/admin/productos/<%= p.id %>/editar" title="Editar">
+                <span class="material-symbols-outlined">edit</span>
+              </a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</section>

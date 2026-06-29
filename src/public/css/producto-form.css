@@ -1,0 +1,188 @@
+/* Estilos del form de alta/edición de producto (vista admin/producto-form).
+   Carga junto con admin.css; depende de sus tokens y de .btn-primary/.field/.form-error. */
+
+.form-card {
+  max-width: 900px;
+  margin-top: 1.5rem;
+}
+
+/* Dos columnas: campos a la izquierda, imagen + guardar a la derecha */
+.form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.form-main,
+.form-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-aside .btn-primary {
+  width: 100%;
+  max-width: none;
+  margin-top: 0;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  background: transparent;
+  border: 1px solid var(--outline-variant);
+  border-radius: 10px;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--error);
+  background: transparent;
+  border: 1px solid var(--error);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  opacity: 0.85;
+}
+
+@media (max-width: 700px) {
+  .form-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Área de subida de imagen (click para abrir el selector) */
+.uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 220px;
+  padding: 1.5rem;
+  border: 1px dashed var(--outline-variant);
+  border-radius: var(--radius);
+  color: var(--on-surface-variant);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.uploader:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.uploader__icon {
+  font-size: 2.5rem;
+}
+
+.uploader__input {
+  display: none;
+}
+
+.form-card .field__label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.form-card .field__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: var(--fs-base);
+  color: var(--on-surface);
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+  transition: border-color 0.15s;
+}
+
+.form-card .field__input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-card textarea.field__input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-card .field__input--lg {
+  min-height: 140px;
+}
+
+/* Cada sección es su propio contenedor (más oscuro que el fondo) */
+.form-section {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+.form-section__title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1.25rem;
+}
+
+/* Fila de dos campos lado a lado (precio/categoría, duración/stock) */
+.fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .fields-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-card select.field__input {
+  cursor: pointer;
+}
+
+.imagen-preview {
+  max-width: 120px;
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+}
+
+.form-error + .form-error {
+  margin-top: 0.5rem;
+}

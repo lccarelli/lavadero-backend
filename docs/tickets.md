@@ -199,27 +199,47 @@ A partir de acá, cada ticket toca BD + backend + frontend + tests donde corresp
 
 ---
 
-## TK-F-03: Modelo Usuario + autenticación admin
+## TK-F-03: Entidad Usuario + endpoint de creación
 
-**Objetivo:** Modelo de usuario admin, registro vía API, login con sesión, middleware de protección.
+**Objetivo:** Modelo `Usuario` único que soporta cliente y admin, y el endpoint de creación del usuario cliente.
 
 **Capas que toca:**
-- **DB:** Modelo `Usuario` con hook beforeSave que hashea password. Seeder de admin de prueba.
+- **DB:** Modelo `Usuario` con `nombre`, `email` (único, null para clientes), `password` (hash, null para clientes) y `esAdmin`. Hook `beforeSave` que hashea el password con bcrypt solo si hay password (los clientes no tienen).
 - **Backend:**
-  - `POST /api/auth/registro-admin`
-  - `POST /api/auth/login` (API)
-  - `GET /admin/login` (vista EJS)
-  - `POST /admin/login` (procesa el form)
-  - `POST /admin/logout`
-  - Middleware `requireAdmin`
+  - `POST /api/usuarios` body `{ nombre }`: crea (o encuentra) un usuario cliente (`esAdmin=false`) por nombre. Valida nombre ≥ 2 caracteres. Devuelve `{ id, nombre }`.
+  - Tests: creación de cliente, find-or-create idempotente, validación de nombre.
+
+**Criterio de aceptación:**
+- Una sola entidad cubre ambos tipos (el admin reutiliza el modelo, sin tabla aparte).
+- `POST /api/usuarios` crea el cliente y es idempotente por nombre.
+- Tests pasan.
+
+**Estado:** ✅ Hecho — `src/models/Usuario.js`, `src/controllers/usuarioController.js` (`crearUsuario`), `src/routes/api/usuarios.js`; tests en `tests/usuarioModel.test.js` y `tests/usuarios.test.js`.
+
+**Estimación:** 1.5 hs
+**Casos de uso relacionados:** CU-2.1.3
+
+---
+
+## TK-F-03.2: Creación de usuario admin + login admin
+
+**Objetivo:** Alta de usuarios admin, login con sesión, middleware de protección y vista EJS de login del backoffice.
+
+**Capas que toca:**
+- **Backend:**
+  - `POST /api/auth/registro-admin` (crea admin con email único + password hasheado)
+  - `POST /api/auth/login` (API; 401 sin filtrar si el email existe)
+  - `GET /admin/login` (vista EJS) y `POST /admin/login` (procesa el form e inicia sesión)
+  - `POST /admin/logout` (destruye la sesión)
+  - Middleware `requireAdmin` (redirige a login en vistas, 401 en API)
+  - Seeder de admin de prueba (admin@lavadero.com / admin123)
   - Tests: hash funciona, login exitoso, login fallido, middleware bloquea sin sesión
-- **Frontend:**
-  - Por ahora, solo un link `<a href="http://localhost:3000/admin/login">Login admin</a>` en el header del cliente
-  - (El backoffice admin es EJS server-rendered por el backend — el frontend de nginx solo expone el flujo del cliente)
 - **Vistas EJS:**
-  - `login.ejs` con form + botón de acceso rápido
+  - `login.ejs` con form + botón de acceso rápido (autocompleta las credenciales del seed)
   - Layout base con header y nav del admin
-- **Tests:** Auth con Supertest, hash con Vitest puro
+- **Frontend:**
+  - Link `<a href="http://localhost:3000/admin/login">Login admin</a>` en el header del cliente
+  - (El backoffice admin es EJS server-rendered por el backend — el frontend de nginx solo expone el flujo del cliente)
 
 **Criterio de aceptación:**
 - `POST /api/auth/registro-admin` crea un admin con password hasheado
@@ -228,8 +248,10 @@ A partir de acá, cada ticket toca BD + backend + frontend + tests donde corresp
 - Acceder a `/admin/dashboard` sin sesión redirige a login
 - Tests pasan
 
-**Estimación:** 4-5 hs
-**Casos de uso relacionados:** CU-2.1.3, CU-2.2.3, CU-4.1.1, CU-4.2.1, CU-4.2.2, CU-4.2.3, CU-4.2.4, CU-4.2.5
+**Estado:** Pendiente
+**Estimación:** 3-4 hs
+**Dependencias:** TK-F-03
+**Casos de uso relacionados:** CU-2.2.3, CU-4.1.1, CU-4.2.1, CU-4.2.2, CU-4.2.3, CU-4.2.4, CU-4.2.5
 
 ---
 
@@ -258,6 +280,83 @@ A partir de acá, cada ticket toca BD + backend + frontend + tests donde corresp
 
 **Estimación:** 5-6 hs
 **Casos de uso relacionados:** CU-3.1.2, CU-3.2.2, CU-3.2.3, CU-3.2.4, CU-3.3.2, CU-6.1.1, CU-6.1.2, CU-6.1.3, CU-6.2.1, CU-6.2.2, CU-6.2.3
+**Dividido en sub-tickets:** TK-F-04.01 → TK-F-04.02 → TK-F-04.03 → TK-F-04.04 (ver detalle en `board-issues.md`)
+
+---
+
+## TK-F-04.01: API CRUD de escritura de productos + validación de imagen
+
+**Objetivo:** Endpoints API de alta/edición/activación de producto y validación de imagen, con lógica reutilizable por las vistas del backoffice.
+
+**Capas que toca:**
+- **Backend:**
+  - `POST /api/productos` (multipart, multer, `activo=true`)
+  - `PUT /api/productos/:id` (imagen opcional, borra la anterior)
+  - `PATCH /api/productos/:id/desactivar` (baja lógica, `activo=false`)
+  - `PATCH /api/productos/:id/activar` (reactivación)
+  - Config `multer` reutilizable (mime permitido + `UPLOAD_MAX_SIZE_MB`)
+  - Middleware de validación de imagen (mime + tamaño)
+  - Service/controller compartido (lo consumen la API y las vistas server-rendered)
+  - `requireAdmin` en las rutas de escritura
+  - Tests: alta, PUT (happy/404/validación), PATCH activar/desactivar, imagen inválida
+
+**Criterio de aceptación:** alta crea con imagen; editar cambia datos/imagen (borra la previa); activar/desactivar togglean estado; imagen inválida → 400; tests pasan.
+
+**Estado:** En progreso
+**Estimación:** 2.5 hs
+**Dependencias:** TK-F-03.2 (`requireAdmin`)
+**Casos de uso relacionados:** CU-3.2.1, CU-3.2.2, CU-3.2.3, CU-3.2.4, CU-3.3.2
+
+---
+
+## TK-F-04.02: Dashboard - tabla de productos con estado
+
+**Objetivo:** Vista EJS del panel que lista todos los productos (activos e inactivos) con su estado.
+
+**Capas que toca:**
+- **Backend:** ruta `GET /admin/productos` con `requireAdmin`
+- **Vistas EJS:** `views/admin/productos.ejs` (tabla: nombre, categoría, precio, estado); reusa `admin-header` + estilos en `admin.css`
+
+**Criterio de aceptación:** el admin ve la tabla con todos los productos y su estado; sin sesión redirige al login.
+
+**Estado:** Pendiente
+**Estimación:** 1.5 hs
+**Dependencias:** TK-F-03.2
+**Casos de uso relacionados:** CU-6.1.1
+
+---
+
+## TK-F-04.03: Alta y edición de producto (vistas server-rendered)
+
+**Objetivo:** Form de alta/edición (reutilizado) que postea a rutas admin y redirige a la tabla.
+
+**Capas que toca:**
+- **Backend:** rutas admin `GET /admin/productos/nuevo`, `POST /admin/productos`, `GET /admin/productos/:id/editar`, `POST /admin/productos/:id`. Reusa el service/controller de TK-F-04.01; re-render con errores de validación
+- **Vistas EJS:** `views/admin/producto-form.ejs` (alta y edición)
+
+**Criterio de aceptación:** alta crea y vuelve a la tabla con el producto nuevo; edición precarga y guarda; validaciones muestran errores en la misma vista.
+
+**Estado:** Pendiente
+**Estimación:** 2 hs
+**Dependencias:** TK-F-04.01, TK-F-04.02
+**Casos de uso relacionados:** CU-6.1.3, CU-6.2.1, CU-6.2.2
+
+---
+
+## TK-F-04.04: Acciones activar/desactivar + modales de confirmación
+
+**Objetivo:** Acciones por fila con confirmación por modal, server-rendered.
+
+**Capas que toca:**
+- **Backend:** rutas admin `POST /admin/productos/:id/activar`, `POST /admin/productos/:id/desactivar`
+- **Vistas EJS:** botones de acción por fila + modal `<dialog>` de confirmación; redirige a la tabla tras la acción
+
+**Criterio de aceptación:** activar/desactivar por modal cambian el estado y se reflejan en la tabla; "editar" lleva al form precargado.
+
+**Estado:** Pendiente
+**Estimación:** 1.5 hs
+**Dependencias:** TK-F-04.01, TK-F-04.02
+**Casos de uso relacionados:** CU-6.1.2, CU-6.2.3
 
 ---
 
@@ -374,7 +473,7 @@ FASE 1 (setup - ~3 hs total):
 TK-S-01 → TK-S-02 → TK-S-03 → TK-S-04 → [TK-S-05 opcional]
 
 FASE 2 (fullstack - cursada, ~30 hs):
-TK-F-01 → TK-F-02 → TK-F-03 → TK-F-04 → TK-F-05 → TK-F-06 → TK-F-07 → TK-F-08
+TK-F-01 → TK-F-02 → TK-F-03 → TK-F-03.2 → TK-F-04 (.01 → .02 → .03 → .04) → TK-F-05 → TK-F-06 → TK-F-07 → TK-F-08
 
 FASE 3 (fullstack - final, ~15 hs):
 TK-F-09 → TK-F-10 → TK-F-11 → TK-F-12

@@ -22,6 +22,12 @@ const Producto = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    stock: {
+      type: DataTypes.INTEGER, // opcional, null para lavados
+    },
+    duracion: {
+      type: DataTypes.INTEGER, // opcional, null para accesorios
+    },
     imagen: {
       type: DataTypes.STRING, // path en el server; null hasta que se suba una imagen
     },

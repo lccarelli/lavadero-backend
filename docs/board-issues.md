@@ -182,14 +182,35 @@ Labels: fullstack, fase-2
 
 ---
 
-## [TK-F-03] Modelo Usuario + autenticación admin
+## [TK-F-03] Entidad Usuario + endpoint de creación
 
 Labels: fullstack, fase-2, backend
 
-**Objetivo:** Usuario admin, registro vía API, login con sesión, middleware de protección, vista EJS de login.
+**Objetivo:** Modelo `Usuario` único que soporta cliente y admin, y el endpoint de creación del usuario cliente.
 
 **Casos de uso cubiertos:**
-- [ ] CU-2.1.3 — Modelo `Usuario` (email único, password hash, es_admin) + hook de hash
+- [x] CU-2.1.3 — Modelo `Usuario` (email único, password hash, es_admin) + hook de hash
+
+**Tareas técnicas:**
+- [x] Modelo `Usuario` con `esAdmin`, `email` único y hook `beforeSave` (bcrypt)
+- [x] `POST /api/usuarios` (crea/encuentra cliente por nombre, valida nombre ≥ 2)
+- [x] Tests: `usuarioModel.test.js`, `usuarios.test.js`
+
+**Criterio de aceptación:** una sola entidad cubre cliente y admin; `POST /api/usuarios` crea el cliente idempotente por nombre; tests pasan.
+
+**Estado:** ✅ Hecho
+
+**Estimación:** 1.5 hs
+
+---
+
+## [TK-F-03.2] Creación de usuario admin + login admin
+
+Labels: fullstack, fase-2, backend
+
+**Objetivo:** Alta de usuarios admin, login con sesión, middleware de protección y vista EJS de login.
+
+**Casos de uso cubiertos:**
 - [ ] CU-2.2.3 — Seed de admin de prueba (admin@lavadero.com / admin123)
 - [ ] CU-4.1.1 — `POST /api/auth/registro-admin` (bcrypt, email único)
 - [ ] CU-4.2.1 — `POST /api/auth/login` (401 sin filtrar si el email existe)
@@ -204,32 +225,106 @@ Labels: fullstack, fase-2, backend
 
 **Criterio de aceptación:** registro hashea; login con seed redirige al dashboard; acceso rápido autocompleta; dashboard sin sesión redirige; tests pasan.
 
-**Estimación:** 4-5 hs
+**Dependencias:** TK-F-03
+
+**Estimación:** 3-4 hs
 
 ---
 
-## [TK-F-04] Backoffice: dashboard y CRUD completo de productos
+## [TK-F-04.01] API CRUD de escritura de productos + validación de imagen
 
 Labels: fullstack, fase-2, backend
 
-**Objetivo:** El admin lista, crea, edita, activa y desactiva productos desde el panel EJS.
+**Objetivo:** Endpoints API de alta/edición/activación de producto y validación de imagen, con lógica reutilizable por las vistas del backoffice.
 
 **Casos de uso cubiertos:**
-- [ ] CU-3.1.2 — `GET /api/productos/:id` (404 si no existe, incluye categoría)
+- [x] CU-3.1.2 — `GET /api/productos/:id` (404 si no existe, incluye categoría) — *ya implementado en TK-F-02*
+- [ ] CU-3.2.1 — `POST /api/productos` (multipart, multer, activo=true)
 - [ ] CU-3.2.2 — `PUT /api/productos/:id` (imagen opcional, borra la anterior)
 - [ ] CU-3.2.3 — Baja lógica `PATCH /:id/desactivar` (activo=false)
 - [ ] CU-3.2.4 — Reactivación `PATCH /:id/activar`
 - [ ] CU-3.3.2 — Middleware de validación de imagen (mime + tamaño)
+
+**Tareas técnicas:**
+- [ ] Config `multer` reutilizable (mime permitido + `UPLOAD_MAX_SIZE_MB`)
+- [ ] Service/controller compartido (lo consumen la API y las vistas server-rendered)
+- [ ] `requireAdmin` en las rutas de escritura
+- [ ] Tests: alta, PUT (happy/404/validación), PATCH activar/desactivar
+
+**Criterio de aceptación:** alta crea con imagen; editar cambia datos/imagen (borra la previa); activar/desactivar togglean estado; imagen inválida → 400; tests pasan.
+
+**Dependencias:** TK-F-03.2 (`requireAdmin`)
+
+**Estimación:** 2.5 hs
+
+---
+
+## [TK-F-04.02] Dashboard: tabla de productos con estado
+
+Labels: fullstack, fase-2, backend
+
+**Objetivo:** Vista EJS del panel que lista todos los productos (activos e inactivos) con su estado.
+
+**Casos de uso cubiertos:**
 - [ ] CU-6.1.1 — Dashboard: tabla de productos con estado
-- [ ] CU-6.1.2 — Acciones por producto (editar / activar / desactivar)
+
+**Tareas técnicas:**
+- [ ] Ruta `GET /admin/productos` con `requireAdmin`
+- [ ] `views/admin/productos.ejs` (tabla: nombre, categoría, precio, estado)
+- [ ] Reusar `admin-header` + estilos en `admin.css`
+
+**Criterio de aceptación:** el admin ve la tabla con todos los productos y su estado; sin sesión redirige al login.
+
+**Dependencias:** TK-F-03.2
+
+**Estimación:** 1.5 hs
+
+---
+
+## [TK-F-04.03] Alta y edición de producto (vistas server-rendered)
+
+Labels: fullstack, fase-2, backend
+
+**Objetivo:** Form de alta/edición (reutilizado) que postea a rutas admin y redirige a la tabla.
+
+**Casos de uso cubiertos:**
 - [ ] CU-6.1.3 — Botón "Agregar producto"
 - [ ] CU-6.2.1 — Pantalla de alta (form + validación)
 - [ ] CU-6.2.2 — Pantalla de edición (reutiliza alta, datos precargados)
+
+**Tareas técnicas:**
+- [ ] Rutas admin: `GET /admin/productos/nuevo`, `POST /admin/productos`, `GET /admin/productos/:id/editar`, `POST /admin/productos/:id`
+- [ ] `views/admin/producto-form.ejs` (alta y edición)
+- [ ] Reusa el service/controller de TK-F-04.01; re-render con errores de validación
+
+**Criterio de aceptación:** alta crea y vuelve a la tabla con el producto nuevo; edición precarga y guarda; validaciones muestran errores en la misma vista.
+
+**Dependencias:** TK-F-04.01, TK-F-04.02
+
+**Estimación:** 2 hs
+
+---
+
+## [TK-F-04.04] Acciones activar/desactivar + modales de confirmación
+
+Labels: fullstack, fase-2, frontend
+
+**Objetivo:** Acciones por fila con confirmación por modal, server-rendered.
+
+**Casos de uso cubiertos:**
+- [ ] CU-6.1.2 — Acciones por producto (editar / activar / desactivar)
 - [ ] CU-6.2.3 — Modales de confirmación (activar/desactivar)
 
-**Criterio de aceptación:** dashboard lista con estados; alta/edición andan; activar/desactivar por modal cambian estado; tests de los endpoints pasan.
+**Tareas técnicas:**
+- [ ] Rutas admin: `POST /admin/productos/:id/activar`, `POST /admin/productos/:id/desactivar`
+- [ ] Botones de acción por fila + modal `<dialog>` de confirmación
+- [ ] Redirige a la tabla tras la acción
 
-**Estimación:** 5-6 hs
+**Criterio de aceptación:** activar/desactivar por modal cambian el estado y se reflejan en la tabla; "editar" lleva al form precargado.
+
+**Dependencias:** TK-F-04.01, TK-F-04.02
+
+**Estimación:** 1.5 hs
 
 ---
 
@@ -422,11 +517,11 @@ Los **85 CUs** del backlog repartidos, cada uno en **un** ticket:
 | 1.1 Backend setup | 1.1.1, 1.1.3, 1.1.4 / 1.1.2 | TK-S-01 / TK-S-03 |
 | 1.2 Frontend setup | 1.2.1 / 1.2.2, 1.2.3, 1.2.4 | TK-S-04 / TK-F-08 |
 | 1.3 Docker | 1.3.1–1.3.4 | TK-S-02 |
-| 2 Modelos | 2.1.1, 2.2.1 / 2.1.2, 2.2.2 / 2.1.3, 2.2.3 / 2.1.4, 2.1.5 / 2.1.6 / 2.1.7 | F-01 / F-02 / F-03 / F-05 / F-09 / F-11 |
-| 3 API productos | 3.1.3 / 3.1.1, 3.2.1, 3.3.1 / 3.1.2, 3.2.2, 3.2.3, 3.2.4, 3.3.2 | F-01 / F-02 / F-04 |
-| 4 Auth | 4.1.1, 4.2.1–4.2.5 | TK-F-03 |
+| 2 Modelos | 2.1.1, 2.2.1 / 2.1.2, 2.2.2 / 2.1.3 / 2.2.3 / 2.1.4, 2.1.5 / 2.1.6 / 2.1.7 | F-01 / F-02 / F-03 / F-03.2 / F-05 / F-09 / F-11 |
+| 3 API productos | 3.1.3 / 3.1.1, 3.3.1 / 3.1.2, 3.2.1, 3.2.2, 3.2.3, 3.2.4, 3.3.2 | F-01 / F-02 / F-04.01 |
+| 4 Auth | 4.1.1, 4.2.1–4.2.5 | TK-F-03.2 |
 | 5 Flujo cliente | 5.2.1, 5.2.2, 5.2.3 / 5.1.1, 5.2.4–5.2.6, 5.3.1–5.3.5 / 5.4.1–5.4.3 | F-02 / F-05 / F-06 |
-| 6 Backoffice | 6.1.1, 6.1.2, 6.1.3, 6.2.1–6.2.3 / 6.1.4 / 6.1.5 | F-04 / F-07 / F-11 |
+| 6 Backoffice | 6.1.1 / 6.1.3, 6.2.1, 6.2.2 / 6.1.2, 6.2.3 / 6.1.4 / 6.1.5 | F-04.02 / F-04.03 / F-04.04 / F-07 / F-11 |
 | 7 Reportes | 7.1.1, 7.1.2 / 7.2.1 | F-07 / F-12 |
 | 8 Encuestas | 8.1.1–8.1.6 / 8.2.1, 8.2.2 | F-09 / F-10 |
 | 9 Registros | 9.1.1, 9.1.2 / 9.2.1–9.2.5 | F-11 / F-12 |

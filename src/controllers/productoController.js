@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Producto, Categoria } from '../models/index.js';
+
+const uploadsDir = process.env.UPLOAD_DIR || 'uploads';
+const rutaImagen = (file) => (file ? `/uploads/${file.filename}` : null);
+// opcionales vacíos se convierten a null
+const enteroOpcional = (v) => (v === undefined || v === '' || v === null ? null : Number(v));
 
 // GET /api/productos?categoria=<id>&activo=true&page=1&limit=8
 // Devuelve { data, pagination }. El cliente pide activo=true; el admin, sin filtro.
@@ -34,7 +41,7 @@ export const listar = async (req, res, next) => {
 };
 
 // GET /api/productos/:id
-// 400 si el id no es válido, 404 si no existe, 200 con el producto (incluye categoría).
+// 400 si el id no es válido, 404 si no existe, 200 con el producto.
 export const obtenerProducto = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -51,4 +58,86 @@ export const obtenerProducto = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+// POST /api/productos
+export const crear = async (req, res, next) => {
+  try {
+    const { nombre, descripcion, precio, categoria_id, stock, duracion } = req.body;
+    const errores = validar(req.body);
+    if (errores.length) return res.status(400).json({ errores });
+
+    const producto = await Producto.create({
+      nombre: nombre.trim(), descripcion, precio,
+      categoria_id: categoria_id || null,
+      stock: enteroOpcional(stock),
+      duracion: enteroOpcional(duracion),
+      imagen: rutaImagen(req.file),
+    });
+    res.status(201).json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PUT /api/productos/:id - si llega imagen nueva, borra la anterior del disco
+export const actualizar = async (req, res, next) => {
+  try {
+    const producto = await Producto.findByPk(req.params.id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    const errores = validar(req.body);
+    if (errores.length) return res.status(400).json({ errores });
+
+    const { nombre, descripcion, precio, categoria_id, stock, duracion } = req.body;
+    const datos = {
+      nombre: nombre.trim(), descripcion, precio,
+      categoria_id: categoria_id || null,
+      stock: enteroOpcional(stock),
+      duracion: enteroOpcional(duracion),
+    };
+    if (req.file) {
+      //fs unlink elimina la imagen anterior
+      if (producto.imagen) fs.unlink(path.join(uploadsDir, path.basename(producto.imagen)), () => {});
+      datos.imagen = rutaImagen(req.file);
+    }
+    await producto.update(datos);
+    res.json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PATCH /api/productos/:id/activar y /:id/desactivar (baja/alta lógica)
+export const activar = async (req, res, next) => {
+  try {
+    const producto = await Producto.findByPk(req.params.id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    
+    await producto.update({ activo: true });
+    res.json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const desactivar = async (req, res, next) => {
+  try {
+    const producto = await Producto.findByPk(req.params.id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    
+    await producto.update({ activo: false });
+    res.json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// nombre, precio (> 0) y categoría obligatorios. Devuelve un array de mensajes.
+const validar = ({ nombre, precio, categoria_id }) => {
+  const errores = [];
+  if (!nombre || !nombre.trim()) errores.push('El nombre es obligatorio');
+  if (!precio || isNaN(precio) || Number(precio) <= 0) errores.push('El precio debe ser un número mayor a 0');
+  if (!categoria_id) errores.push('La categoría es obligatoria');
+  return errores;
 };

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('../partials/head', { title: producto ? 'Editar producto' : 'Nuevo producto' }) %>
+</head>
+<body class="admin">
+  <%- include('../partials/admin-header', { usuario }) %>
+
+  <main class="admin-main">
+    <h1 class="admin-main__title"><%= producto ? 'Editar producto' : 'Nuevo producto' %></h1>
+
+    <div class="form-card">
+      <div id="form-errores"></div>
+
+      <form id="producto-form" data-id="<%= producto ? producto.id : '' %>" enctype="multipart/form-data">
+        <div class="form-layout">
+        <div class="form-main">
+        <section class="form-section">
+          <h2 class="form-section__title">Informacion general</h2>
+          <div class="field">
+            <label class="field__label" for="nombre">Nombre del producto</label>
+            <input class="field__input" type="text" id="nombre" name="nombre" value="<%= producto ? producto.nombre : '' %>" required />
+          </div>
+
+          <div class="fields-row">
+            <div class="field">
+              <label class="field__label" for="precio">Precio</label>
+              <input class="field__input" type="number" step="0.01" id="precio" name="precio" value="<%= producto ? producto.precio : '' %>" required />
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="categoria_id">Categoria</label>
+              <select class="field__input" id="categoria_id" name="categoria_id" required>
+                <option value="" disabled <%= producto ? '' : 'selected' %>>Elegí una categoría</option>
+                <% categorias.forEach(cat => { %>
+                  <option value="<%= cat.id %>" <%= producto && producto.categoria_id == cat.id ? 'selected' : '' %>><%= cat.nombre %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="form-section__title">Datos adicionales</h2>
+          <div class="fields-row">
+            <div class="field">
+              <label class="field__label" for="duracion">Duracion (min)</label>
+              <input class="field__input" type="number" id="duracion" name="duracion" value="<%= producto ? producto.duracion : '' %>" />
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="stock">Stock</label>
+              <input class="field__input" type="number" id="stock" name="stock" value="<%= producto ? producto.stock : '' %>" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="descripcion">Descripcion</label>
+            <textarea class="field__input field__input--lg" id="descripcion" name="descripcion"><%= producto ? producto.descripcion : '' %></textarea>
+          </div>
+        </section>
+        </div>
+
+        <aside class="form-aside">
+          <section class="form-section">
+            <h2 class="form-section__title">Imagen de producto</h2>
+            <label class="uploader" for="imagen">
+              <% if (producto && producto.imagen) { %>
+                <img class="imagen-preview" src="<%= producto.imagen %>" alt="Imagen actual" />
+              <% } %>
+              <span class="material-symbols-outlined uploader__icon">cloud_upload</span>
+              <span class="uploader__text">Click para subir</span>
+            </label>
+            <input class="uploader__input" type="file" id="imagen" name="imagen" accept="image/jpeg,image/png,image/webp" />
+          </section>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">
+              <span class="material-symbols-outlined">save</span>
+              <%= producto ? 'Guardar cambios' : 'Guardar producto' %>
+            </button>
+
+            <a class="btn-secondary" href="/admin/dashboard">
+              <span class="material-symbols-outlined">arrow_back</span>
+              Cancelar y volver
+            </a>
+
+            <% if (producto) { %>
+              <button type="button" id="btn-toggle-activo" class="<%= producto.activo ? 'btn-danger' : 'btn-secondary' %>" data-accion="<%= producto.activo ? 'desactivar' : 'activar' %>">
+                <span class="material-symbols-outlined"><%= producto.activo ? 'block' : 'check_circle' %></span>
+                <%= producto.activo ? 'Desactivar producto' : 'Activar producto' %>
+              </button>
+            <% } %>
+          </div>
+        </aside>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="/public/js/admin-producto-form.js"></script>
+</body>
+</html>
