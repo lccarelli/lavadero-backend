@@ -1,4 +1,9 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Producto, Categoria } from '../models/index.js';
+
+const uploadsDir = process.env.UPLOAD_DIR || 'uploads';
+const rutaImagen = (file) => (file ? `/uploads/${file.filename}` : null);
 
 // GET /api/productos?categoria=<id>&activo=true&page=1&limit=8
 // Devuelve { data, pagination }. El cliente pide activo=true; el admin, sin filtro.
@@ -47,6 +52,66 @@ export const obtenerProducto = async (req, res, next) => {
     if (!producto) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
+    res.json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// POST /api/productos
+export const crear = async (req, res, next) => {
+  try {
+    const { nombre, descripcion, precio, categoria_id } = req.body;
+    if (!nombre || !precio) {
+      return res.status(400).json({ error: 'Nombre y precio son obligatorios' });
+    }
+    const producto = await Producto.create({
+      nombre, descripcion, precio, categoria_id, imagen: rutaImagen(req.file),
+    });
+    res.status(201).json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PUT /api/productos/:id 
+//Si tiene imagen elimina la anterior
+export const actualizar = async (req, res, next) => {
+  try {
+    const producto = await Producto.findByPk(req.params.id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    const { nombre, descripcion, precio, categoria_id } = req.body;
+    const datos = { nombre, descripcion, precio, categoria_id };
+    if (req.file) {
+      //fs unlink elimina la imagen anterior
+      if (producto.imagen) fs.unlink(path.join(uploadsDir, path.basename(producto.imagen)), () => {});
+      datos.imagen = rutaImagen(req.file);
+    }
+    await producto.update(datos);
+    res.json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PATCH /api/productos/:id/activar y /:id/desactivar (baja/alta lógica)
+export const activar = async (req, res, next) => {
+  try {
+    const producto = await Producto.findByPk(req.params.id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    await producto.update({ activo: true });
+    res.json(producto);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const desactivar = async (req, res, next) => {
+  try {
+    const producto = await Producto.findByPk(req.params.id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    await producto.update({ activo: false });
     res.json(producto);
   } catch (err) {
     next(err);

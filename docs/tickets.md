@@ -280,6 +280,83 @@ A partir de acá, cada ticket toca BD + backend + frontend + tests donde corresp
 
 **Estimación:** 5-6 hs
 **Casos de uso relacionados:** CU-3.1.2, CU-3.2.2, CU-3.2.3, CU-3.2.4, CU-3.3.2, CU-6.1.1, CU-6.1.2, CU-6.1.3, CU-6.2.1, CU-6.2.2, CU-6.2.3
+**Dividido en sub-tickets:** TK-F-04.01 → TK-F-04.02 → TK-F-04.03 → TK-F-04.04 (ver detalle en `board-issues.md`)
+
+---
+
+## TK-F-04.01: API CRUD de escritura de productos + validación de imagen
+
+**Objetivo:** Endpoints API de alta/edición/activación de producto y validación de imagen, con lógica reutilizable por las vistas del backoffice.
+
+**Capas que toca:**
+- **Backend:**
+  - `POST /api/productos` (multipart, multer, `activo=true`)
+  - `PUT /api/productos/:id` (imagen opcional, borra la anterior)
+  - `PATCH /api/productos/:id/desactivar` (baja lógica, `activo=false`)
+  - `PATCH /api/productos/:id/activar` (reactivación)
+  - Config `multer` reutilizable (mime permitido + `UPLOAD_MAX_SIZE_MB`)
+  - Middleware de validación de imagen (mime + tamaño)
+  - Service/controller compartido (lo consumen la API y las vistas server-rendered)
+  - `requireAdmin` en las rutas de escritura
+  - Tests: alta, PUT (happy/404/validación), PATCH activar/desactivar, imagen inválida
+
+**Criterio de aceptación:** alta crea con imagen; editar cambia datos/imagen (borra la previa); activar/desactivar togglean estado; imagen inválida → 400; tests pasan.
+
+**Estado:** En progreso
+**Estimación:** 2.5 hs
+**Dependencias:** TK-F-03.2 (`requireAdmin`)
+**Casos de uso relacionados:** CU-3.2.1, CU-3.2.2, CU-3.2.3, CU-3.2.4, CU-3.3.2
+
+---
+
+## TK-F-04.02: Dashboard - tabla de productos con estado
+
+**Objetivo:** Vista EJS del panel que lista todos los productos (activos e inactivos) con su estado.
+
+**Capas que toca:**
+- **Backend:** ruta `GET /admin/productos` con `requireAdmin`
+- **Vistas EJS:** `views/admin/productos.ejs` (tabla: nombre, categoría, precio, estado); reusa `admin-header` + estilos en `admin.css`
+
+**Criterio de aceptación:** el admin ve la tabla con todos los productos y su estado; sin sesión redirige al login.
+
+**Estado:** Pendiente
+**Estimación:** 1.5 hs
+**Dependencias:** TK-F-03.2
+**Casos de uso relacionados:** CU-6.1.1
+
+---
+
+## TK-F-04.03: Alta y edición de producto (vistas server-rendered)
+
+**Objetivo:** Form de alta/edición (reutilizado) que postea a rutas admin y redirige a la tabla.
+
+**Capas que toca:**
+- **Backend:** rutas admin `GET /admin/productos/nuevo`, `POST /admin/productos`, `GET /admin/productos/:id/editar`, `POST /admin/productos/:id`. Reusa el service/controller de TK-F-04.01; re-render con errores de validación
+- **Vistas EJS:** `views/admin/producto-form.ejs` (alta y edición)
+
+**Criterio de aceptación:** alta crea y vuelve a la tabla con el producto nuevo; edición precarga y guarda; validaciones muestran errores en la misma vista.
+
+**Estado:** Pendiente
+**Estimación:** 2 hs
+**Dependencias:** TK-F-04.01, TK-F-04.02
+**Casos de uso relacionados:** CU-6.1.3, CU-6.2.1, CU-6.2.2
+
+---
+
+## TK-F-04.04: Acciones activar/desactivar + modales de confirmación
+
+**Objetivo:** Acciones por fila con confirmación por modal, server-rendered.
+
+**Capas que toca:**
+- **Backend:** rutas admin `POST /admin/productos/:id/activar`, `POST /admin/productos/:id/desactivar`
+- **Vistas EJS:** botones de acción por fila + modal `<dialog>` de confirmación; redirige a la tabla tras la acción
+
+**Criterio de aceptación:** activar/desactivar por modal cambian el estado y se reflejan en la tabla; "editar" lleva al form precargado.
+
+**Estado:** Pendiente
+**Estimación:** 1.5 hs
+**Dependencias:** TK-F-04.01, TK-F-04.02
+**Casos de uso relacionados:** CU-6.1.2, CU-6.2.3
 
 ---
 
@@ -396,7 +473,7 @@ FASE 1 (setup - ~3 hs total):
 TK-S-01 → TK-S-02 → TK-S-03 → TK-S-04 → [TK-S-05 opcional]
 
 FASE 2 (fullstack - cursada, ~30 hs):
-TK-F-01 → TK-F-02 → TK-F-03 → TK-F-03.2 → TK-F-04 → TK-F-05 → TK-F-06 → TK-F-07 → TK-F-08
+TK-F-01 → TK-F-02 → TK-F-03 → TK-F-03.2 → TK-F-04 (.01 → .02 → .03 → .04) → TK-F-05 → TK-F-06 → TK-F-07 → TK-F-08
 
 FASE 3 (fullstack - final, ~15 hs):
 TK-F-09 → TK-F-10 → TK-F-11 → TK-F-12
