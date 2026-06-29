@@ -4,7 +4,7 @@ import { Producto, Categoria } from '../models/index.js';
 
 const uploadsDir = process.env.UPLOAD_DIR || 'uploads';
 const rutaImagen = (file) => (file ? `/uploads/${file.filename}` : null);
-// si los campos opcionales (duracion, stock) vienen vacíos, los guardo como null en la DB
+// opcionales vacíos se convierten a null
 const enteroOpcional = (v) => (v === undefined || v === '' || v === null ? null : Number(v));
 
 // GET /api/productos?categoria=<id>&activo=true&page=1&limit=8
@@ -41,7 +41,7 @@ export const listar = async (req, res, next) => {
 };
 
 // GET /api/productos/:id
-// 400 si el id no es válido, 404 si no existe, 200 con el producto (incluye categoría).
+// 400 si el id no es válido, 404 si no existe, 200 con el producto.
 export const obtenerProducto = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -64,11 +64,12 @@ export const obtenerProducto = async (req, res, next) => {
 export const crear = async (req, res, next) => {
   try {
     const { nombre, descripcion, precio, categoria_id, stock, duracion } = req.body;
-    if (!nombre || !precio) {
-      return res.status(400).json({ error: 'Nombre y precio son obligatorios' });
-    }
+    const errores = validar(req.body);
+    if (errores.length) return res.status(400).json({ errores });
+
     const producto = await Producto.create({
-      nombre, descripcion, precio, categoria_id,
+      nombre: nombre.trim(), descripcion, precio,
+      categoria_id: categoria_id || null,
       stock: enteroOpcional(stock),
       duracion: enteroOpcional(duracion),
       imagen: rutaImagen(req.file),
@@ -79,16 +80,19 @@ export const crear = async (req, res, next) => {
   }
 };
 
-// PUT /api/productos/:id 
-//Si tiene imagen elimina la anterior
+// PUT /api/productos/:id - si llega imagen nueva, borra la anterior del disco
 export const actualizar = async (req, res, next) => {
   try {
     const producto = await Producto.findByPk(req.params.id);
     if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
 
+    const errores = validar(req.body);
+    if (errores.length) return res.status(400).json({ errores });
+
     const { nombre, descripcion, precio, categoria_id, stock, duracion } = req.body;
     const datos = {
-      nombre, descripcion, precio, categoria_id,
+      nombre: nombre.trim(), descripcion, precio,
+      categoria_id: categoria_id || null,
       stock: enteroOpcional(stock),
       duracion: enteroOpcional(duracion),
     };
@@ -127,4 +131,13 @@ export const desactivar = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+// nombre, precio (> 0) y categoría obligatorios. Devuelve un array de mensajes.
+const validar = ({ nombre, precio, categoria_id }) => {
+  const errores = [];
+  if (!nombre || !nombre.trim()) errores.push('El nombre es obligatorio');
+  if (!precio || isNaN(precio) || Number(precio) <= 0) errores.push('El precio debe ser un número mayor a 0');
+  if (!categoria_id) errores.push('La categoría es obligatoria');
+  return errores;
 };

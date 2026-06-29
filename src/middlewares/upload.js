@@ -14,10 +14,12 @@ const upload = multer({
   limits: { fileSize: maxMb * 1024 * 1024 },
 });
 
-// Procesa el campo imagen y responde 400 si el archivo no es válido.
+// Procesa el campo imagen y responde 400 (JSON) si el archivo no es válido.
 export const subirImagenProducto = (req, res, next) => {
   upload.single('imagen')(req, res, (err) => {
-    if (err) return res.status(400).json({ error: 'Imagen inválida' });
+    if (err) {
+      return res.status(400).json({ errores: ['Imagen inválida (formatos: JPG, PNG, WEBP; máx 2 MB)'] });
+    }
     next();
   });
 };
