@@ -1,0 +1,14 @@
+<header class="admin-header">
+  <span class="admin-header__brand">AutoLavado express</span>
+  <% if (typeof usuario !== 'undefined' && usuario) { %>
+    <div class="admin-header__user">
+      <span class="admin-header__name"><%= usuario.nombre %></span>
+      <form method="POST" action="/admin/logout">
+        <button type="submit" class="btn-logout">
+          Salir
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      </form>
+    </div>
+  <% } %>
+</header>

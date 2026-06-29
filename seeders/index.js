@@ -1,5 +1,5 @@
 import sequelize, { testConnection } from '../src/config/database.js';
-import { syncDatabase, Categoria, Producto } from '../src/models/index.js';
+import { syncDatabase, Categoria, Producto, Usuario } from '../src/models/index.js';
 import { warmup } from '../src/config/warmup.js';
 
 const productos = [
@@ -36,7 +36,13 @@ const seed = async () => {
     });
   }
 
-  console.log(`Seeders completados (${productos.length} productos)`);
+  // Admin de prueba (CU-2.2.3). El password se hashea en el hook beforeSave del modelo.
+  await Usuario.findOrCreate({
+    where: { email: 'admin@lavadero.com' },
+    defaults: { nombre: 'admin', email: 'admin@lavadero.com', password: '123Qwerty', esAdmin: true },
+  });
+
+  console.log(`Seeders completados (${productos.length} productos, admin: admin@lavadero.com / 123Qwerty)`);
   await sequelize.close();
 };
 

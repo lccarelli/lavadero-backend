@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <%- include('../partials/head', { title: 'Acceso Admin' }) %>
+</head>
+<body>
+  <header class="login-brand">AutoLavado express</header>
+
+  <main class="login-wrap">
+    <div class="login-card">
+      <h1 class="login-card__title">Acceso Admin</h1>
+      <p class="login-card__subtitle">Ingresa tus credenciales para gestionar la plataforma</p>
+
+      <% if (error) { %>
+        <p class="form-error"><%= error %></p>
+      <% } %>
+
+      <form method="POST" action="/admin/login">
+        <div class="field">
+          <label class="field__label" for="email">Usuario</label>
+          <div class="field__control">
+            <span class="field__icon material-symbols-outlined">person</span>
+            <input class="field__input" type="email" id="email" name="email" placeholder="admin@lavadero.com" required />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="password">Contraseña</label>
+          <div class="field__control">
+            <span class="field__icon material-symbols-outlined">lock</span>
+            <input class="field__input" type="password" id="password" name="password" placeholder="******" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox">
+            <input class="checkbox__input" type="checkbox" name="recordarme" />
+            Recordarme
+          </label>
+          <a class="link-forgot" href="#">¿Has olvidado tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          Acceder al panel
+          <span class="material-symbols-outlined">login</span>
+        </button>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
