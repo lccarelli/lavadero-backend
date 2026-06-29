@@ -29,12 +29,14 @@ export async function prepararBaseDeDatos() {
         nombre: 'Lavado Express',
         descripcion: 'Lavado exterior rápido',
         precio: 8.5,
+        duracion: 30,
         categoria_id: lavados.id,
     });
     const cera = await Producto.create({
         nombre: 'Cera protectora',
         descripcion: 'Cera para carrocería',
         precio: 22.0,
+        stock: 12,
         categoria_id: accesorios.id,
     });
     const productoInactivo = await Producto.create({
