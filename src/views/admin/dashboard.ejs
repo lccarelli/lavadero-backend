@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <%- include('../partials/head', { title: 'Dashboard' }) %>
+</head>
+<body>
+  <%- include('../partials/admin-header', { usuario }) %>
+
+  <main class="admin-main">
+    <h1 class="admin-main__title">Panel de administración</h1>
+    <p class="admin-main__text">Bienvenido, <%= usuario.nombre %>. La gestión de productos se agrega en TK-F-04.</p>
+  </main>
+</body>
+</html>
