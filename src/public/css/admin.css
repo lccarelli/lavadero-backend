@@ -17,6 +17,12 @@ body {
   flex-direction: column;
 }
 
+/* La pantalla de admin usa los tokens del theme; el login mantiene su paleta propia. */
+body.admin {
+  color: var(--on-surface);
+  background-color: var(--surface);
+}
+
 .material-symbols-outlined {
   line-height: 1;
   vertical-align: middle;
@@ -25,7 +31,7 @@ body {
 /* ---- Header de marca ---- */
 .login-brand {
   padding: 1.25rem 1.5rem;
-  font-size: 1.25rem;
+  font-size: var(--fs-lg);
   font-weight: 800;
   color: #7cd6fd;
   text-align: center;
@@ -51,14 +57,14 @@ body {
 }
 
 .login-card__title {
-  font-size: 1.5rem;
+  font-size: var(--fs-xl);
   font-weight: 800;
   margin-bottom: 0.5rem;
 }
 
 .login-card__subtitle {
   color: #9fb3c8;
-  font-size: 0.95rem;
+  font-size: var(--fs-sm);
   margin-bottom: 1.75rem;
 }
 
@@ -70,7 +76,7 @@ body {
 .field__label {
   display: block;
   margin-bottom: 0.4rem;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: #6acbf4;
 }
@@ -85,7 +91,7 @@ body {
   top: 50%;
   transform: translateY(-50%);
   color: #6acbf4;
-  font-size: 1.25rem;
+  font-size: var(--fs-lg);
   pointer-events: none;
 }
 
@@ -93,7 +99,7 @@ body {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.6rem;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: var(--fs-base);
   color: #e8eef6;
   background: #061224;
   border: 1px solid #16304f;
@@ -113,7 +119,7 @@ body {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
 }
 
 .checkbox {
@@ -146,7 +152,7 @@ body {
   gap: 0.5rem;
   padding: 0.8rem 1rem;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: var(--fs-base);
   font-weight: 700;
   color: #e8eef6;
   background: #006886;
@@ -167,13 +173,13 @@ body {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: #0a1a30;
-  border-bottom: 1px solid #16304f;
+  background: var(--surface-container-low);
+  border-bottom: 1px solid var(--outline-variant);
 }
 
 .admin-header__brand {
   font-weight: 800;
-  color: #7cd6fd;
+  color: var(--primary);
 }
 
 .admin-header__user {
@@ -183,8 +189,8 @@ body {
 }
 
 .admin-header__name {
-  color: #9fb3c8;
-  font-size: 0.9rem;
+  color: var(--on-surface-variant);
+  font-size: var(--fs-sm);
 }
 
 .btn-logout {
@@ -193,10 +199,10 @@ body {
   gap: 0.4rem;
   padding: 0.5rem 0.9rem;
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   font-weight: 700;
-  color: #e8eef6;
-  background: #006886;
+  color: var(--on-primary);
+  background: var(--primary);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -212,13 +218,120 @@ body {
 }
 
 .admin-main__title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
+  font-size: var(--fs-xl);
+}
+
+.admin-main__subtitle {
+  font-size: var(--fs-xs);
+  margin-bottom: 1.5rem;
+  color: var(--on-surface-variant);
 }
 
 .admin-main__text {
-  color: #9fb3c8;
+  color: var(--on-surface-variant);
+}
+
+/* ---- Tabla de productos ---- */
+.tabla-seccion {
+  margin-top: 2rem;
+}
+
+.tabla-seccion__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.tabla-seccion__titulo::before {
+  content: "";
+  width: 4px;
+  height: 1.1em;
+  background: var(--primary);
+  border-radius: var(--radius-full);
+}
+
+.tabla-seccion--secondary .tabla-seccion__titulo::before {
+  background: var(--secondary);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+  background: var(--surface-container-low);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--surface-container-high);
+}
+
+.tabla th {
+  background: var(--surface-container-high);
+  color: var(--primary);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tabla tbody tr:hover {
+  background: var(--surface-container);
+}
+
+.tabla__precio {
+  color: var(--primary);
+}
+
+.accion {
+  display: inline-flex;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.accion:hover {
+  opacity: 0.7;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  border: 1px solid currentColor;
+}
+
+.badge--activo {
+  color: var(--green);
+}
+
+.badge--inactivo {
+  color: var(--error);
+}
+
+/* ---- Link de acción (navegación entre vistas del admin) ---- */
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+  color: var(--on-primary);
+  background: var(--primary);
+  border-radius: 10px;
+  text-decoration: none;
+}
+
+.btn-action:hover {
+  opacity: 0.9;
 }
 
 /* ---- Error de formulario ---- */
@@ -229,5 +342,5 @@ body {
   padding: 0.6rem 0.9rem;
   border-radius: var(--radius);
   margin-bottom: 1.25rem;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
 }
