@@ -1,0 +1,233 @@
+/* Estilos del backoffice. La tipografía sale de theme.css (var(--font)).
+   Convención BEM (igual que el frontend): .bloque__elemento, .bloque--modificador. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  color: #e8eef6;
+  background-color: #020c1b;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.material-symbols-outlined {
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* ---- Header de marca ---- */
+.login-brand {
+  padding: 1.25rem 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #7cd6fd;
+  text-align: center;
+}
+
+/* ---- Login ---- */
+.login-wrap {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  background: #162b3c;
+  border: 1px solid #16304f;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.login-card__subtitle {
+  color: #9fb3c8;
+  font-size: 0.95rem;
+  margin-bottom: 1.75rem;
+}
+
+/* ---- Campo (label + input con icono) ---- */
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.field__label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6acbf4;
+}
+
+.field__control {
+  position: relative;
+}
+
+.field__icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6acbf4;
+  font-size: 1.25rem;
+  pointer-events: none;
+}
+
+.field__input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.6rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #e8eef6;
+  background: #061224;
+  border: 1px solid #16304f;
+  border-radius: var(--radius);
+  transition: border-color 0.15s;
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: #7cd6fd;
+}
+
+/* ---- Fila checkbox + link ---- */
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #9fb3c8;
+  cursor: pointer;
+}
+
+.checkbox__input {
+  accent-color: #7cd6fd;
+}
+
+.link-forgot {
+  color: #6acbf4;
+  text-decoration: none;
+}
+
+.link-forgot:hover {
+  text-decoration: underline;
+}
+
+/* ---- Botón ---- */
+.btn-primary {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e8eef6;
+  background: #006886;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* ---- Header del backoffice (dashboard) ---- */
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #0a1a30;
+  border-bottom: 1px solid #16304f;
+}
+
+.admin-header__brand {
+  font-weight: 800;
+  color: #7cd6fd;
+}
+
+.admin-header__user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-header__name {
+  color: #9fb3c8;
+  font-size: 0.9rem;
+}
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #e8eef6;
+  background: #006886;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  opacity: 0.9;
+}
+
+/* ---- Contenido del dashboard ---- */
+.admin-main {
+  padding: 2rem 1.5rem;
+}
+
+.admin-main__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.admin-main__text {
+  color: #9fb3c8;
+}
+
+/* ---- Error de formulario ---- */
+.form-error {
+  color: #ffb4ab;
+  background: #3a1620;
+  border: 1px solid #ba1a1a;
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+}
