@@ -7,8 +7,16 @@
   <%- include('../partials/admin-header', { usuario }) %>
 
   <main class="admin-main">
-    <h1 class="admin-main__title">Dashboard de administración</h1>
-    <p class="admin-main__subtitle">Gestiona tu catálogo de servicios y productos</p>
+    <div class="admin-main__head">
+      <div>
+        <h1 class="admin-main__title">Dashboard de administración</h1>
+        <p class="admin-main__subtitle">Gestiona tu catálogo de servicios y productos</p>
+      </div>
+      <a class="btn-action" href="/admin/productos/nuevo">
+        <span class="material-symbols-outlined">add</span>
+        Nuevo producto
+      </a>
+    </div>
 
     <%- include('../partials/tabla-productos', { titulo: 'Lavados y Paquetes', productos: lavados, modificador: '', campoExtra: 'duracion', etiquetaExtra: 'Duración' }) %>
     <%- include('../partials/tabla-productos', { titulo: 'Accesorios y otros', productos: otros, modificador: 'tabla-seccion--secondary', campoExtra: 'stock', etiquetaExtra: 'Stock' }) %>

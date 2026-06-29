@@ -17,13 +17,13 @@ const datosSesion = (usuario) => ({
   email: usuario.email,
 });
 
-// GET /admin/login — vista. Si ya hay sesión, va directo al dashboard.
+// GET /admin/login - vista. Si ya hay sesión, va directo al dashboard.
 export const renderLogin = (req, res) => {
   if (req.session?.usuario) return res.redirect('/admin/dashboard');
   res.render('admin/login', { error: null });
 };
 
-// POST /admin/login — procesa el form, inicia sesión y redirige al dashboard.
+// POST /admin/login - procesa el form, inicia sesión y redirige al dashboard.
 // En error re-renderiza la misma vista con un mensaje genérico (401).
 export const login = async (req, res, next) => {
   try {
@@ -39,12 +39,12 @@ export const login = async (req, res, next) => {
   }
 };
 
-// POST /admin/logout — elimina la sesión y vuelve al login.
+// POST /admin/logout - elimina la sesión y vuelve al login.
 export const logout = (req, res) => {
   req.session.destroy(() => res.redirect('/admin/login'));
 };
 
-// POST /api/auth/registro-admin — crea un admin (es_admin = true).
+// POST /api/auth/registro-admin - crea un admin (es_admin = true).
 export const registroAdmin = async (req, res, next) => {
   try {
     const nombre = (req.body.nombre || '').trim();
@@ -63,7 +63,7 @@ export const registroAdmin = async (req, res, next) => {
   }
 };
 
-// POST /api/auth/login — login por API. Inicia la misma sesión que la vista.
+// POST /api/auth/login - login por API. Inicia la misma sesión que la vista.
 // 401 genérico sin filtrar si el email existe.
 export const loginApi = async (req, res, next) => {
   try {
