@@ -5,6 +5,13 @@
     <p class="admin-main__text">No hay productos en esta categoría.</p>
   <% } else { %>
     <table class="tabla">
+      <colgroup>
+        <col class="col-nombre" />
+        <% if (campoExtra) { %><col class="col-extra" /><% } %>
+        <col class="col-precio" />
+        <col class="col-estado" />
+        <col class="col-acciones" />
+      </colgroup>
       <thead>
         <tr>
           <th>Nombre</th>

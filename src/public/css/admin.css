@@ -20,7 +20,7 @@ body {
 /* La pantalla de admin usa los tokens del theme; el login mantiene su paleta propia. */
 body.admin {
   color: var(--on-surface);
-  background-color: var(--surface);
+  background-color: var(--surface-container);
 }
 
 .material-symbols-outlined {
@@ -217,6 +217,18 @@ body.admin {
   padding: 2rem 1.5rem;
 }
 
+.admin-main__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-main__head .btn-action {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
 .admin-main__title {
   font-size: var(--fs-xl);
 }
@@ -258,6 +270,7 @@ body.admin {
 
 .tabla {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   margin-top: 1rem;
@@ -265,6 +278,13 @@ body.admin {
   border-radius: var(--radius);
   overflow: hidden;
 }
+
+/* Anchos compartidos para ambas tablas */
+.col-nombre { width: 40%; }
+.col-extra { width: 16%; }
+.col-precio { width: 16%; }
+.col-estado { width: 16%; }
+.col-acciones { width: 12%; }
 
 .tabla th,
 .tabla td {
