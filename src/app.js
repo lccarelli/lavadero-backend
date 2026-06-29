@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import express from 'express';
+import session from 'express-session';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import apiRoutes from './routes/api/index.js';
+import adminRoutes from './routes/admin/index.js';
 import { testConnection } from './config/database.js';
 import { syncDatabase } from './models/index.js';
 import { warmup } from './config/warmup.js';
@@ -22,6 +24,13 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Sesión para mantener el login del admin
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secreto-tp',
+  resave: false,
+  saveUninitialized: false,
+}));
+
 // Vistas EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -37,7 +46,7 @@ app.get('/health', (req, res) => {
 
 // TODO: rutas API y admin (se agregan en tickets posteriores)
 app.use('/api', apiRoutes);
-// app.use('/admin', adminRoutes);
+app.use('/admin', adminRoutes);
 
 // Middleware central de errores
 app.use((err, req, res, next) => {
