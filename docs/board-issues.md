@@ -182,14 +182,35 @@ Labels: fullstack, fase-2
 
 ---
 
-## [TK-F-03] Modelo Usuario + autenticación admin
+## [TK-F-03] Entidad Usuario + endpoint de creación
 
 Labels: fullstack, fase-2, backend
 
-**Objetivo:** Usuario admin, registro vía API, login con sesión, middleware de protección, vista EJS de login.
+**Objetivo:** Modelo `Usuario` único que soporta cliente y admin, y el endpoint de creación del usuario cliente.
 
 **Casos de uso cubiertos:**
-- [ ] CU-2.1.3 — Modelo `Usuario` (email único, password hash, es_admin) + hook de hash
+- [x] CU-2.1.3 — Modelo `Usuario` (email único, password hash, es_admin) + hook de hash
+
+**Tareas técnicas:**
+- [x] Modelo `Usuario` con `esAdmin`, `email` único y hook `beforeSave` (bcrypt)
+- [x] `POST /api/usuarios` (crea/encuentra cliente por nombre, valida nombre ≥ 2)
+- [x] Tests: `usuarioModel.test.js`, `usuarios.test.js`
+
+**Criterio de aceptación:** una sola entidad cubre cliente y admin; `POST /api/usuarios` crea el cliente idempotente por nombre; tests pasan.
+
+**Estado:** ✅ Hecho
+
+**Estimación:** 1.5 hs
+
+---
+
+## [TK-F-03.2] Creación de usuario admin + login admin
+
+Labels: fullstack, fase-2, backend
+
+**Objetivo:** Alta de usuarios admin, login con sesión, middleware de protección y vista EJS de login.
+
+**Casos de uso cubiertos:**
 - [ ] CU-2.2.3 — Seed de admin de prueba (admin@lavadero.com / admin123)
 - [ ] CU-4.1.1 — `POST /api/auth/registro-admin` (bcrypt, email único)
 - [ ] CU-4.2.1 — `POST /api/auth/login` (401 sin filtrar si el email existe)
@@ -204,7 +225,9 @@ Labels: fullstack, fase-2, backend
 
 **Criterio de aceptación:** registro hashea; login con seed redirige al dashboard; acceso rápido autocompleta; dashboard sin sesión redirige; tests pasan.
 
-**Estimación:** 4-5 hs
+**Dependencias:** TK-F-03
+
+**Estimación:** 3-4 hs
 
 ---
 
@@ -422,9 +445,9 @@ Los **85 CUs** del backlog repartidos, cada uno en **un** ticket:
 | 1.1 Backend setup | 1.1.1, 1.1.3, 1.1.4 / 1.1.2 | TK-S-01 / TK-S-03 |
 | 1.2 Frontend setup | 1.2.1 / 1.2.2, 1.2.3, 1.2.4 | TK-S-04 / TK-F-08 |
 | 1.3 Docker | 1.3.1–1.3.4 | TK-S-02 |
-| 2 Modelos | 2.1.1, 2.2.1 / 2.1.2, 2.2.2 / 2.1.3, 2.2.3 / 2.1.4, 2.1.5 / 2.1.6 / 2.1.7 | F-01 / F-02 / F-03 / F-05 / F-09 / F-11 |
+| 2 Modelos | 2.1.1, 2.2.1 / 2.1.2, 2.2.2 / 2.1.3 / 2.2.3 / 2.1.4, 2.1.5 / 2.1.6 / 2.1.7 | F-01 / F-02 / F-03 / F-03.2 / F-05 / F-09 / F-11 |
 | 3 API productos | 3.1.3 / 3.1.1, 3.2.1, 3.3.1 / 3.1.2, 3.2.2, 3.2.3, 3.2.4, 3.3.2 | F-01 / F-02 / F-04 |
-| 4 Auth | 4.1.1, 4.2.1–4.2.5 | TK-F-03 |
+| 4 Auth | 4.1.1, 4.2.1–4.2.5 | TK-F-03.2 |
 | 5 Flujo cliente | 5.2.1, 5.2.2, 5.2.3 / 5.1.1, 5.2.4–5.2.6, 5.3.1–5.3.5 / 5.4.1–5.4.3 | F-02 / F-05 / F-06 |
 | 6 Backoffice | 6.1.1, 6.1.2, 6.1.3, 6.2.1–6.2.3 / 6.1.4 / 6.1.5 | F-04 / F-07 / F-11 |
 | 7 Reportes | 7.1.1, 7.1.2 / 7.2.1 | F-07 / F-12 |
