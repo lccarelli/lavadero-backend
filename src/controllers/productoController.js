@@ -64,9 +64,6 @@ export const obtenerProducto = async (req, res, next) => {
 export const crear = async (req, res, next) => {
   try {
     const { nombre, descripcion, precio, categoria_id, stock, duracion } = req.body;
-    const errores = validar(req.body);
-    if (errores.length) return res.status(400).json({ errores });
-
     const producto = await Producto.create({
       nombre: nombre.trim(), descripcion, precio,
       categoria_id: categoria_id || null,
@@ -85,9 +82,6 @@ export const actualizar = async (req, res, next) => {
   try {
     const producto = await Producto.findByPk(req.params.id);
     if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
-
-    const errores = validar(req.body);
-    if (errores.length) return res.status(400).json({ errores });
 
     const { nombre, descripcion, precio, categoria_id, stock, duracion } = req.body;
     const datos = {
@@ -131,13 +125,4 @@ export const desactivar = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-// nombre, precio (> 0) y categoría obligatorios. Devuelve un array de mensajes.
-const validar = ({ nombre, precio, categoria_id }) => {
-  const errores = [];
-  if (!nombre || !nombre.trim()) errores.push('El nombre es obligatorio');
-  if (!precio || isNaN(precio) || Number(precio) <= 0) errores.push('El precio debe ser un número mayor a 0');
-  if (!categoria_id) errores.push('La categoría es obligatoria');
-  return errores;
 };
