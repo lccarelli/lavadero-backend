@@ -20,12 +20,6 @@ function obtenerVentaCompleta(id) {
 export const registrarVenta = async (req, res, next) => {
   try {
     const { usuario_id, items } = req.body;
-    if (!usuario_id) {
-      return res.status(400).json({ error: 'Falta el usuario' });
-    }
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'El carrito está vacío' });
-    }
     const ventaId = await crearVenta({ usuarioId: usuario_id, items });
     res.status(201).json(await obtenerVentaCompleta(ventaId));
   } catch (err) {
