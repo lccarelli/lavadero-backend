@@ -65,9 +65,9 @@
           <section class="form-section">
             <h2 class="form-section__title">Imagen de producto</h2>
             <label class="uploader" for="imagen">
-              <% if (producto && producto.imagen) { %>
-                <img class="imagen-preview" src="<%= producto.imagen %>" alt="Imagen actual" />
-              <% } %>
+              <img class="imagen-preview" id="imagen-preview" alt="Vista previa"
+                   src="<%= producto && producto.imagen ? producto.imagen : '' %>"
+                   <%= producto && producto.imagen ? '' : 'hidden' %> />
               <span class="material-symbols-outlined uploader__icon">cloud_upload</span>
               <span class="uploader__text">Click para subir</span>
             </label>

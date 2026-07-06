@@ -3,8 +3,18 @@ const contenedorErrores = document.getElementById('form-errores');
 
 const inputImagen = document.getElementById('imagen');
 const textoUploader = document.querySelector('.uploader__text');
+const previewImagen = document.getElementById('imagen-preview');
 inputImagen.addEventListener('change', () => {
-  textoUploader.textContent = inputImagen.files.length ? inputImagen.files[0].name : 'Click para subir';
+  const archivo = inputImagen.files[0];
+  textoUploader.textContent = archivo ? archivo.name : 'Click para subir';
+  if (archivo) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      previewImagen.src = reader.result;
+      previewImagen.hidden = false;
+    };
+    reader.readAsDataURL(archivo);
+  }
 });
 
 // Lavados llevan duración (no stock); Accesorios al revés.
