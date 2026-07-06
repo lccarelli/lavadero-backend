@@ -10,6 +10,7 @@ import {describe, it, expect, beforeEach, afterAll} from 'vitest';
 import request from 'supertest';
 import app from '../src/app.js';
 import {prepararBaseDeDatos, cerrarBaseDeDatos} from './helpers/db.js';
+import {Producto, Usuario} from '../src/models/index.js';
 
 let datos;
 beforeEach(async () => {
@@ -131,5 +132,63 @@ describe('GET /api/productos/:id (detalle)', () => {
         // Assert
         expect(res.status).toBe(400);
         expect(res.body.error).toBe('Id de producto inválido');
+    });
+});
+
+describe('POST /api/productos (crear + validación)', () => {
+    // Crea un admin y devuelve un agente ya logueado (mantiene la cookie de sesión).
+    async function agenteAdmin() {
+        await Usuario.create({nombre: 'Admin', email: 'admin@lavadero.com', password: '123Qwerty', esAdmin: true});
+        const agent = request.agent(app);
+        await agent.post('/admin/login').type('form').send({email: 'admin@lavadero.com', password: '123Qwerty'});
+        return agent;
+    }
+
+    it('caso normal: crea un producto con datos válidos (201)', async () => {
+        const agent = await agenteAdmin();
+        const res = await agent.post('/api/productos').send({
+            nombre: 'Lavado Premium',
+            precio: 30,
+            categoria_id: datos.categorias.lavados.id,
+        });
+
+        expect(res.status).toBe(201);
+        expect(res.body.nombre).toBe('Lavado Premium');
+
+        const enBd = await Producto.findByPk(res.body.id);
+        expect(enBd).not.toBeNull();
+    });
+
+    it('error: sin nombre devuelve 400 con el error del campo', async () => {
+        const agent = await agenteAdmin();
+        const res = await agent.post('/api/productos').send({
+            precio: 30,
+            categoria_id: datos.categorias.lavados.id,
+        });
+
+        expect(res.status).toBe(400);
+        expect(res.body.errores).toContain('El nombre es obligatorio');
+    });
+
+    it('error: precio menor o igual a 0 devuelve 400', async () => {
+        const agent = await agenteAdmin();
+        const res = await agent.post('/api/productos').send({
+            nombre: 'Gratis',
+            precio: 0,
+            categoria_id: datos.categorias.lavados.id,
+        });
+
+        expect(res.status).toBe(400);
+        expect(res.body.errores).toContain('El precio debe ser un número mayor a 0');
+    });
+
+    it('error: sin sesión de admin devuelve 401 (requireAdmin)', async () => {
+        const res = await request(app).post('/api/productos').send({
+            nombre: 'Lavado Premium',
+            precio: 30,
+            categoria_id: datos.categorias.lavados.id,
+        });
+
+        expect(res.status).toBe(401);
     });
 });
