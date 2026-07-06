@@ -6,6 +6,7 @@ import Producto from './Producto.js';
 import Usuario from './Usuario.js';
 import Venta from './Venta.js';
 import VentaProducto from './VentaProducto.js';
+import Encuesta from './Encuesta.js';
 
 // Asociaciones
 Categoria.hasMany(Producto, { foreignKey: 'categoria_id', as: 'productos' });
@@ -21,6 +22,10 @@ VentaProducto.belongsTo(Venta, { foreignKey: 'venta_id' });
 VentaProducto.belongsTo(Producto, { foreignKey: 'producto_id', as: 'producto' });
 Producto.hasMany(VentaProducto, { foreignKey: 'producto_id' });
 
+// Una Encuesta puede referirse a una Venta (opcional; venta_id viene del ticket)
+Venta.hasMany(Encuesta, { foreignKey: 'venta_id' });
+Encuesta.belongsTo(Venta, { foreignKey: 'venta_id', as: 'venta' });
+
 export const syncDatabase = async () => {
   try {
     await sequelize.sync({ alter: false });
@@ -31,4 +36,4 @@ export const syncDatabase = async () => {
   }
 };
 
-export { sequelize, Categoria, Producto, Usuario, Venta, VentaProducto };
+export { sequelize, Categoria, Producto, Usuario, Venta, VentaProducto, Encuesta };
