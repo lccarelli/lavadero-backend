@@ -79,6 +79,6 @@ describe('requireAdmin (GET /admin/dashboard)', () => {
 
     const res = await agent.get('/admin/dashboard');
     expect(res.status).toBe(200);
-    expect(res.text).toContain('Panel de administración');
+    expect(res.text).toContain('Dashboard de administración');
   });
 });
