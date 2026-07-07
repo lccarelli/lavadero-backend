@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { renderLogin, login, logout } from '../../controllers/authController.js';
 import productosRouter from './productos.js';
+import usuariosRouter from './usuarios.js';
 
 const router = Router();
 
@@ -16,5 +17,7 @@ router.post('/logout', logout);
 
 // Rutas de producto del backoffice (dashboard, alta, edición).
 router.use(productosRouter);
+// Ruta de alta de administrador del backoffice.
+router.use(usuariosRouter);
 
 export default router;
