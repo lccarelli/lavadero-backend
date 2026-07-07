@@ -1,0 +1,292 @@
+{
+  "info": {
+    "name": "Lavadero API - TP Integrador",
+    "description": "Colección completa de la API del lavadero (backend Express). \n\nBase: http://localhost:3000 (variable {{baseUrl}}).\n\nAUTENTICACIÓN: los endpoints de escritura de productos y el backoffice requieren sesión de admin. Corré primero 'Auth > Login (API)' (o 'Backoffice > Login (form)') con admin@lavadero.com / 123Qwerty: Postman guarda la cookie de sesión y la manda en las requests siguientes.\n\nDatos de prueba: correr el seed en el backend (npm run seed).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "adminEmail", "value": "admin@lavadero.com" },
+    { "key": "adminPassword", "value": "123Qwerty" },
+    { "key": "productoId", "value": "1" },
+    { "key": "categoriaId", "value": "1" },
+    { "key": "usuarioId", "value": "1" },
+    { "key": "ventaId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+            "description": "Verifica que el backend está levantado."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /api/auth/registro-admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Admin\",\n  \"email\": \"nuevo@lavadero.com\",\n  \"password\": \"secreto1\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/auth/registro-admin", "host": ["{{baseUrl}}"], "path": ["api", "auth", "registro-admin"] },
+            "description": "Crea un usuario admin (es_admin=true). El password se hashea con bcrypt."
+          }
+        },
+        {
+          "name": "POST /api/auth/login (API)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "description": "Login por API. Inicia sesión y setea la cookie que necesitan las rutas protegidas. Correr esto ANTES de crear/editar productos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorías",
+      "item": [
+        {
+          "name": "GET /api/categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/categorias", "host": ["{{baseUrl}}"], "path": ["api", "categorias"] },
+            "description": "Lista las categorías (Lavados, Accesorios)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "GET /api/productos (paginado + filtros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/productos?page=1&limit=6&activo=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "productos"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "6" },
+                { "key": "activo", "value": "true" },
+                { "key": "categoria", "value": "1", "disabled": true }
+              ]
+            },
+            "description": "Listado paginado. Devuelve { data, pagination }. Filtros opcionales: categoria (id), activo=true."
+          }
+        },
+        {
+          "name": "GET /api/productos/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/productos/{{productoId}}", "host": ["{{baseUrl}}"], "path": ["api", "productos", "{{productoId}}"] },
+            "description": "Detalle de un producto con su categoría. 400 si el id es inválido, 404 si no existe."
+          }
+        },
+        {
+          "name": "POST /api/productos (admin, multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "nombre", "value": "Lavado de Prueba", "type": "text" },
+                { "key": "precio", "value": "8500", "type": "text" },
+                { "key": "categoria_id", "value": "{{categoriaId}}", "type": "text" },
+                { "key": "descripcion", "value": "Producto creado desde Postman", "type": "text" },
+                { "key": "duracion", "value": "30", "type": "text" },
+                { "key": "stock", "value": "", "type": "text" },
+                { "key": "imagen", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/productos", "host": ["{{baseUrl}}"], "path": ["api", "productos"] },
+            "description": "Crea un producto. REQUIERE sesión de admin (correr Login antes). La imagen es opcional (campo file 'imagen')."
+          }
+        },
+        {
+          "name": "PUT /api/productos/:id (admin, multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "nombre", "value": "Lavado de Prueba (editado)", "type": "text" },
+                { "key": "precio", "value": "9900", "type": "text" },
+                { "key": "categoria_id", "value": "{{categoriaId}}", "type": "text" },
+                { "key": "descripcion", "value": "Editado desde Postman", "type": "text" },
+                { "key": "imagen", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/productos/{{productoId}}", "host": ["{{baseUrl}}"], "path": ["api", "productos", "{{productoId}}"] },
+            "description": "Actualiza un producto. REQUIERE sesión de admin. Si mandás imagen nueva, borra la anterior."
+          }
+        },
+        {
+          "name": "PATCH /api/productos/:id/desactivar (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/productos/{{productoId}}/desactivar", "host": ["{{baseUrl}}"], "path": ["api", "productos", "{{productoId}}", "desactivar"] },
+            "description": "Baja lógica: activo=false. REQUIERE sesión de admin."
+          }
+        },
+        {
+          "name": "PATCH /api/productos/:id/activar (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/productos/{{productoId}}/activar", "host": ["{{baseUrl}}"], "path": ["api", "productos", "{{productoId}}", "activar"] },
+            "description": "Reactiva: activo=true. REQUIERE sesión de admin."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "POST /api/usuarios",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Cliente Postman\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": ["{{baseUrl}}"], "path": ["api", "usuarios"] },
+            "description": "Crea (o encuentra) un usuario cliente por nombre. Devuelve { id, nombre }. Usá ese id para crear una venta."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ventas",
+      "item": [
+        {
+          "name": "POST /api/ventas",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"usuario_id\": {{usuarioId}},\n  \"items\": [\n    { \"producto_id\": 1, \"cantidad\": 2 },\n    { \"producto_id\": 5, \"cantidad\": 1 }\n  ]\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{baseUrl}}/api/ventas", "host": ["{{baseUrl}}"], "path": ["api", "ventas"] },
+            "description": "Registra la venta. El total lo calcula el backend (no se manda). Devuelve la venta con sus items y el snapshot de precio."
+          }
+        },
+        {
+          "name": "GET /api/ventas/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/ventas/{{ventaId}}", "host": ["{{baseUrl}}"], "path": ["api", "ventas", "{{ventaId}}"] },
+            "description": "Recupera la venta (para el ticket), con usuario e items."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Encuestas",
+      "item": [
+        {
+          "name": "POST /api/encuestas (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "email", "value": "cliente@mail.com", "type": "text" },
+                { "key": "comentario", "value": "Muy buena atención", "type": "text" },
+                { "key": "puntuacion", "value": "9", "type": "text" },
+                { "key": "recomendaria", "value": "true", "type": "text" },
+                { "key": "venta_id", "value": "", "type": "text" },
+                { "key": "imagen", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/encuestas", "host": ["{{baseUrl}}"], "path": ["api", "encuestas"] },
+            "description": "Encuesta de satisfacción (pública). Valida email, comentario (mín 5) y puntuación 1-10. Imagen opcional. venta_id opcional."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Backoffice (EJS)",
+      "item": [
+        {
+          "name": "GET /admin/login (vista)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/admin/login", "host": ["{{baseUrl}}"], "path": ["admin", "login"] },
+            "description": "Renderiza la página de login (HTML)."
+          }
+        },
+        {
+          "name": "POST /admin/login (form)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "email", "value": "{{adminEmail}}", "type": "text" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/admin/login", "host": ["{{baseUrl}}"], "path": ["admin", "login"] },
+            "description": "Login del backoffice (form). Setea la cookie de sesión y redirige al dashboard."
+          }
+        },
+        {
+          "name": "GET /admin/dashboard (requiere sesión)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/admin/dashboard", "host": ["{{baseUrl}}"], "path": ["admin", "dashboard"] },
+            "description": "Dashboard con las tablas de productos. Requiere estar logueado."
+          }
+        },
+        {
+          "name": "GET /admin/productos/nuevo (form alta)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/admin/productos/nuevo", "host": ["{{baseUrl}}"], "path": ["admin", "productos", "nuevo"] },
+            "description": "Vista del formulario de alta de producto. Requiere sesión."
+          }
+        },
+        {
+          "name": "GET /admin/productos/:id/editar (form edición)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/admin/productos/{{productoId}}/editar", "host": ["{{baseUrl}}"], "path": ["admin", "productos", "{{productoId}}", "editar"] },
+            "description": "Vista del formulario de edición. Requiere sesión."
+          }
+        },
+        {
+          "name": "POST /admin/logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/admin/logout", "host": ["{{baseUrl}}"], "path": ["admin", "logout"] },
+            "description": "Cierra la sesión y redirige al login."
+          }
+        }
+      ]
+    }
+  ]
+}
