@@ -48,6 +48,26 @@ describe('GET /api/productos (listado)', () => {
         expect(res.body.data.every((producto) => producto.activo)).toBe(true);
     });
 
+    it('cliente (activo=true): oculta accesorios sin stock (0), pero el admin (sin filtro) sí los ve', async () => {
+        // Arrange: un accesorio sin stock (stock 0).
+        await Producto.create({
+            nombre: 'Cera agotada',
+            precio: 5,
+            stock: 0,
+            categoria_id: datos.categorias.accesorios.id,
+        });
+
+        // Act + Assert: para el cliente NO aparece; los servicios (stock null) sí.
+        const cliente = await request(app).get('/api/productos?activo=true');
+        const nombresCliente = cliente.body.data.map((p) => p.nombre);
+        expect(nombresCliente).not.toContain('Cera agotada');
+        expect(nombresCliente).toContain('Lavado Express');
+
+        // Sin activo=true (el dashboard del admin) SÍ aparece.
+        const admin = await request(app).get('/api/productos');
+        expect(admin.body.data.map((p) => p.nombre)).toContain('Cera agotada');
+    });
+
     it('filtro por categoría: devuelve solo los productos de esa categoría', async () => {
         // Act
         const res = await request(app).get(`/api/productos?categoria=${datos.categorias.accesorios.id}`);
