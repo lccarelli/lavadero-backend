@@ -17,8 +17,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares base
+// Orígenes permitidos por CORS. FRONTEND_URL puede ser una lista separada por comas
+// (ej. Docker nginx en :8080 y el built-in server de WebStorm en :63342).
+const origenesPermitidos = (process.env.FRONTEND_URL || 'http://localhost:8080,http://localhost:63342')
+  .split(',')
+  .map((origen) => origen.trim());
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
+  origin: origenesPermitidos,
   credentials: true,
 }));
 app.use(express.json());
