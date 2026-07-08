@@ -43,8 +43,22 @@
           Acceder al panel
           <span class="material-symbols-outlined">login</span>
         </button>
+
+        <p class="login-demo-caption">¿Sos tester? Entrá con las credenciales de prueba:</p>
+        <button type="button" class="btn-demo" id="btn-acceso-rapido">
+          <span class="material-symbols-outlined">bolt</span>
+          Acceso rápido (demo)
+        </button>
       </form>
     </div>
   </main>
+
+  <script>
+    // Acceso rápido para testers: rellena las credenciales del admin de prueba.
+    document.getElementById('btn-acceso-rapido').addEventListener('click', () => {
+      document.getElementById('email').value = 'admin@lavadero.com';
+      document.getElementById('password').value = '123Qwerty';
+    });
+  </script>
 </body>
 </html>

@@ -166,6 +166,34 @@ body.admin {
   opacity: 0.9;
 }
 
+/* Botón de acceso rápido (demo) del login */
+.login-demo-caption {
+  text-align: center;
+  color: var(--on-surface-variant);
+  font-size: 0.8rem;
+  margin: 1rem 0 0.5rem;
+}
+.btn-demo {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  font-family: inherit;
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--on-surface);
+  background: transparent;
+  border: 1px solid var(--outline-variant);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-demo:hover {
+  background: var(--surface-container-low);
+}
+
 /* ---- Header del backoffice (dashboard) ---- */
 .admin-header {
   display: flex;
