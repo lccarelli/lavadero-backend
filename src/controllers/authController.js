@@ -50,9 +50,6 @@ export const registroAdmin = async (req, res, next) => {
     const nombre = (req.body.nombre || '').trim();
     const email = (req.body.email || '').trim();
     const { password } = req.body;
-    if (nombre.length < 2 || !email || !password) {
-      return res.status(400).json({ error: 'nombre (mín 2), email y password son obligatorios' });
-    }
     if (await Usuario.findOne({ where: { email } })) {
       return res.status(409).json({ error: 'El email ya está registrado' });
     }

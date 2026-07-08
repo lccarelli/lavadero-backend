@@ -15,9 +15,18 @@ afterAll(cerrarBaseDeDatos);
 const crearAdmin = () =>
   Usuario.create({ nombre: 'Admin', email: 'admin@lavadero.com', password: '123Qwerty', esAdmin: true });
 
+// Crea un admin base y devuelve un agente logueado (el endpoint está protegido).
+async function agenteAdmin() {
+  await crearAdmin();
+  const agent = request.agent(app);
+  await agent.post('/admin/login').type('form').send({ email: 'admin@lavadero.com', password: '123Qwerty' });
+  return agent;
+}
+
 describe('POST /api/auth/registro-admin', () => {
   it('crea un admin con password hasheado y es_admin true', async () => {
-    const res = await request(app)
+    const agent = await agenteAdmin();
+    const res = await agent
       .post('/api/auth/registro-admin')
       .send({ nombre: 'Nuevo', email: 'nuevo@lavadero.com', password: 'secreto1' });
 
@@ -32,12 +41,30 @@ describe('POST /api/auth/registro-admin', () => {
   });
 
   it('email duplicado devuelve 409', async () => {
-    await crearAdmin();
-    const res = await request(app)
+    const agent = await agenteAdmin(); // crea admin@lavadero.com y loguea
+    const res = await agent
       .post('/api/auth/registro-admin')
       .send({ nombre: 'Otro', email: 'admin@lavadero.com', password: 'otra1234' });
 
     expect(res.status).toBe(409);
+  });
+
+  it('sin sesión de admin devuelve 401 (endpoint protegido)', async () => {
+    const res = await request(app)
+      .post('/api/auth/registro-admin')
+      .send({ nombre: 'Nuevo', email: 'nuevo@lavadero.com', password: 'secreto1' });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('datos inválidos (email/password) devuelven 400', async () => {
+    const agent = await agenteAdmin();
+    const res = await agent
+      .post('/api/auth/registro-admin')
+      .send({ nombre: 'X', email: 'no-es-email', password: '123' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errores).toBeDefined();
   });
 });
 
