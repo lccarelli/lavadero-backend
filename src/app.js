@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import apiRoutes from './routes/api/index.js';
 import adminRoutes from './routes/admin/index.js';
+import { logger } from './middlewares/logger.js';
 import { testConnection } from './config/database.js';
 import { syncDatabase } from './models/index.js';
 import { warmup } from './config/warmup.js';
@@ -23,6 +24,9 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Log de cada request/response (entra y sale).
+app.use(logger);
 
 // Sesión para mantener el login del admin
 app.use(session({
