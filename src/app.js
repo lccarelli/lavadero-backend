@@ -17,8 +17,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares base
+// CORS: en dev aceptamos cualquier localhost / 127.0.0.1 (sin importar el puerto:
+// nginx :8080, WebStorm :63342, etc.). FRONTEND_URL agrega orígenes extra (lista por comas).
+const origenesExtra = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((origen) => origen.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
+  origin(origin, callback) {
+    // Sin origin (curl, Postman) o cualquier localhost/127.0.0.1 -> permitido.
+    const esLocal = !origin || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+    callback(null, esLocal || origenesExtra.includes(origin));
+  },
   credentials: true,
 }));
 app.use(express.json());
