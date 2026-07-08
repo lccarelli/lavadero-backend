@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { Op } from 'sequelize';
 import { Producto, Categoria } from '../models/index.js';
 
 const uploadsDir = process.env.UPLOAD_DIR || 'uploads';
@@ -16,7 +17,12 @@ export const listar = async (req, res, next) => {
 
     const where = {};
     if (req.query.categoria) where.categoria_id = req.query.categoria;
-    if (req.query.activo === 'true') where.activo = true;
+    if (req.query.activo === 'true') {
+      where.activo = true;
+      // No mostramos al cliente los accesorios sin stock (stock = 0).
+      // Los lavados (servicios) tienen stock null y siempre se muestran.
+      where[Op.or] = [{ stock: null }, { stock: { [Op.gt]: 0 } }];
+    }
 
     const { count, rows } = await Producto.findAndCountAll({
       where,
