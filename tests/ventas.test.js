@@ -83,7 +83,7 @@ describe('POST /api/ventas (registrar venta)', () => {
 
     // Assert
     expect(res.status).toBe(400);
-    expect(res.body.error).toBe('Falta el usuario');
+    expect(res.body.errores).toContain('Falta el usuario');
   });
 
   it('error: carrito vacío devuelve 400', async () => {
@@ -94,7 +94,7 @@ describe('POST /api/ventas (registrar venta)', () => {
 
     // Assert
     expect(res.status).toBe(400);
-    expect(res.body.error).toBe('El carrito está vacío');
+    expect(res.body.errores).toContain('El carrito está vacío');
   });
 
   it('error: items con un tipo inválido (no es array) devuelve 400', async () => {
@@ -105,7 +105,7 @@ describe('POST /api/ventas (registrar venta)', () => {
 
     // Assert
     expect(res.status).toBe(400);
-    expect(res.body.error).toBe('El carrito está vacío');
+    expect(res.body.errores).toContain('El carrito está vacío');
   });
 
   it('error: producto inactivo devuelve 400 (baja lógica impide venderlo)', async () => {
@@ -147,7 +147,7 @@ describe('POST /api/ventas (registrar venta)', () => {
 
     // Assert
     expect(res.status).toBe(400);
-    expect(res.body.error).toBe('Cantidad inválida');
+    expect(res.body.errores).toContain('La cantidad debe ser al menos 1');
   });
 });
 
